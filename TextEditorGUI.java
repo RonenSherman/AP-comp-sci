@@ -5,12 +5,11 @@ import java.io.*;
 import java.util.ArrayList;
 
 
-public class TextEditorGUI {
+public class TextEditorGUI { //       Ronen Sherman File text editor
 
-
+   static ArrayList<String> FileNames = new ArrayList<String>();
     public static void main(String[] args) {
-    ArrayList<String> FileNames = new ArrayList<String>();
-        JFrame frame = new JFrame("Text Editor");
+       JFrame frame = new JFrame("Text Editor");
         frame.setForeground(Color.CYAN);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.YELLOW);
@@ -39,8 +38,8 @@ public class TextEditorGUI {
             String Filename = JOptionPane.showInputDialog(null, "How would you like to name this file?");
             try {
                 File myObj = new File(Filename + ".txt");
-
-                if (myObj.createNewFile()) {
+                    FileNames.add(Filename);
+               if (myObj.createNewFile()) {
                    JOptionPane.showMessageDialog(null,"File created: " + myObj.getName());
                 } else {
                     JOptionPane.showMessageDialog(null, "File already exists.");
@@ -55,8 +54,8 @@ public class TextEditorGUI {
     public static class EditFilePressed implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JList FileList = new JList();
-
+            JList<String> list = new JList<String>(FileNames.toArray(new String[FileNames.size()]));
+     //   frame.add(list);
         }
     }
 }
