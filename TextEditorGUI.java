@@ -2,6 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.*;
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 
@@ -9,7 +12,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
 
    static ArrayList<String> FileNames = new ArrayList<String>();
     public static void main(String[] args) {
-       JFrame frame = new JFrame("Text Editor");
+        JFrame frame = new JFrame("Text Editor");
         frame.setForeground(Color.CYAN);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setBackground(Color.YELLOW);
@@ -23,7 +26,6 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
         button1.setPreferredSize(new Dimension(300,100));
          button1.addActionListener(new FileCreatePressed());
         frame.add(button1);
-
         JButton button2 = new JButton();
         button2.setText("Edit existing File");
         button2.setPreferredSize(new Dimension(300,100));
@@ -46,7 +48,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
 
                 }
             } catch (IOException h) {
-                JOptionPane.showMessageDialog(null, "Oops something happened...");
+                JOptionPane.showMessageDialog(null, "damn you really screwed this up");
                 h.printStackTrace();
             }
         }
@@ -54,9 +56,27 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
     public static class EditFilePressed implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JList<String> list = new JList<String>(FileNames.toArray(new String[FileNames.size()]));
-     //   frame.add(list);
-        }
-    }
-}
+            String input = JOptionPane.showInputDialog(null, "Which file would you like to open?");
+            JFrame frame = new JFrame("File input ");
+            String filenames = input + ".txt";
+            Path fileName = Path.of("/Users/shermanr/IdeaProjects/AP-comp-sci/" + filenames);
+           JTextField field = new JTextField();
+            frame.add(field);
+            frame.setVisible(true);
 
+            String text = field.getText();
+         //field.write(new Writer(FileNames));
+
+
+            try {
+                Files.writeString(fileName, text);
+                String fileContent = Files.readString(fileName);
+                System.out.println(fileContent);
+            } catch (IOException f) {
+
+                System.err.println("An error occurred: " + f.getMessage());
+            }
+
+                }
+            }
+    }
