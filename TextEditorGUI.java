@@ -23,7 +23,6 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
         button1.setPreferredSize(new Dimension(300,100));
          button1.addActionListener(new FileCreatePressed());
         frame.add(button1);
-
         JButton button2 = new JButton();
         button2.setText("Edit existing File");
         button2.setPreferredSize(new Dimension(300,100));
@@ -54,8 +53,14 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
     public static class EditFilePressed implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            JList<String> list = new JList<String>(FileNames.toArray(new String[FileNames.size()]));
-     //   frame.add(list);
+      String filechoice = JOptionPane.showInputDialog(null, "Enter the name of the file you would like to edit");
+      for (int i = 0; i < FileNames.size(); i++)
+      {
+          if(filechoice == FileNames.get(i))
+          {
+              JOptionPane.showMessageDialog(null, "Oops something happened...");
+          }
+      }
         }
     }
 }
