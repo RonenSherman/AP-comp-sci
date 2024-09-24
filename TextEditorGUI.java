@@ -53,7 +53,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
             }
         }
     }
-    public static class EditFilePressed implements ActionListener {
+    public static class EditFilePressed implements ActionListener { // file stuff
         @Override
         public void actionPerformed(ActionEvent e) {
             String input = JOptionPane.showInputDialog(null, "Which file would you like to open?");
