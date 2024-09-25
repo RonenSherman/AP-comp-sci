@@ -1,22 +1,22 @@
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class GUI {
 
-public static void main(String[] args)
-{
-//JOptionPane.showMessageDialog(null, "Hello , World!");
+public static void main(String[] args) throws IOException {
+    String input = JOptionPane.showInputDialog(null, "Which file would you like to open?");
 
-    JFrame frame = new JFrame("Text Editor");
-    frame.setForeground(Color.WHITE);
-    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    frame.setBackground(Color.WHITE);
-    frame.setSize(600, 250);
-    frame.setLayout(new FlowLayout());
-    String[] data = {"one", "two", "three", "four"};
-    JList<String> myList = new JList<String>(data);
-myList.setBackground(Color.WHITE);
-    frame.add(myList);
+    Path filePath = Path.of("C:\\Users\\roshe\\IdeaProjects\\AP-comp-sci\\" + input + ".txt");
+    String content = Files.readString(filePath);
+    JFrame frame = new JFrame();
+    JTextField field = new JTextField();
+    frame.add(field);
+    frame.setPreferredSize(new Dimension(500,500));
+    frame.pack();
     frame.setVisible(true);
+     field.setText(content);
 }
 }
