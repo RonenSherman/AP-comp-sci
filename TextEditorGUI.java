@@ -79,7 +79,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
             frame.add(field);
             frame.setPreferredSize(new Dimension(500,500));
             frame.pack();
-            field.addKeyListener(EnterKeyPressed);
+            field.addKeyListener(EnterKeyPressed);//fg
             frame.setVisible(true);
             field.setText(content);
           /*  try {
