@@ -88,7 +88,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
             String text = field.getText();
           /*  try {
                 Files.writeString(filePath, text);
-                String fileContent = readString(filePath);
+                String fileContent = readString(filePath); bruh
                 System.out.println(fileContent);
             } catch (IOException f) {
 
