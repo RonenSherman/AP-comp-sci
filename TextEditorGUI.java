@@ -98,7 +98,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
         }
 
         @Override
-        public void keyReleased(KeyEvent e) {
+        public void keyReleased(KeyEvent e) {//
 
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 String text = field.getText();
