@@ -59,7 +59,6 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
             }
         }
     }
-
     public static class EditFilePressed implements ActionListener, KeyListener { // file stuff
         String input;
         Path filePath;
@@ -83,7 +82,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
             frame.setPreferredSize(new Dimension(500, 500));
             frame.pack();
             frame.setVisible(true);
-            field.addKeyListener(new EditFilePressed());
+            field.addKeyListener(this);
             field.setText(content);
         }
 
@@ -109,7 +108,6 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
                 } catch (IOException f) {
                     System.out.println("H");
                 }
-                System.out.println(text + "File text");
             }
         }
     }
