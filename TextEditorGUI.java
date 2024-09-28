@@ -62,7 +62,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor
     public static class EditFilePressed implements ActionListener, KeyListener { // file stuff
         String input;
         Path filePath;
-      private JTextField field = new JTextField();
+      private JTextArea field = new JTextArea();
 
         @Override
 
