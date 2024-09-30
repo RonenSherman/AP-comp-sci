@@ -29,7 +29,7 @@ import java.util.*;
       Path filePath = Path.of("/Users/shermanr/IdeaProjects/AP-comp-sci/Hangman.txt");
         String content = null;
         try {
-            content = Files.readAllLines(filePath).toString();
+            content = Files.readAllLines(filePath).toString();//
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
