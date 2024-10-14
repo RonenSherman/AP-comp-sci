@@ -1,39 +1,30 @@
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.*;
-
-    public class Hangman {
+public class Hangman {
     public static class Playerdata {
         public List<String> Words;
         public List<Character> CorrectChars;
         public List<Character> Incorrectwords;
         public String word;
         public boolean isCorrect;
-        public int guess;
         public int Correctguess;
         public int mistakes;
         public boolean isIncorrect;
     }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FileNotFoundException {
         Playerdata p = new Playerdata();
         SetupGame(p);
     }
-
-    static void SetupGame(Playerdata p) {
+    static void SetupGame(Playerdata p) throws FileNotFoundException {
         p.mistakes = 0;
+        p.Words = new LinkedList<>();
         p.isIncorrect = false;
         p.Correctguess = 0;
         p.isCorrect = false;
-      Path filePath = Path.of("/Users/shermanr/IdeaProjects/AP-comp-sci/Hangman.txt");
-        String content = null;
-        try {
-            content = Files.readAllLines(filePath).toString();//
-        } catch (IOException ex) {
-            throw new RuntimeException(ex);
-        }
-        p.Words = new ArrayList<>(Arrays.asList(content));
+        Scanner scan = new Scanner(new File("/Users/shermanr/IdeaProjects/AP-comp-sci/Hangman.txt"));
+        while (scan.hasNextLine())
+            p.Words.add(scan.nextLine());
         p.CorrectChars = new ArrayList<>(Arrays.asList('_', '_', '_', '_', '_'));
         p.Incorrectwords = new ArrayList<>(Arrays.asList(' ', ' ', ' ', ' ', ' '));
         int RandomWord = new Random().nextInt(p.Words.size());
@@ -41,7 +32,6 @@ import java.util.*;
         UpDateGame(p);
         DoGameLoop(p);
     }
-
     static void UpDateGame(Playerdata p) {
         switch (p.mistakes) {
             case 0:
@@ -49,7 +39,7 @@ import java.util.*;
                 break;
             case 1:
                 System.out.println("______\n|    |\n|    O\n|\n|\n|    " + String.join(" ", p.Incorrectwords.toString()) + "\n\n\n" + String.join(" ", p.CorrectChars.toString()));
-                break;
+                break;  
             case 2:
                 System.out.println("______\n|    |\n|    O\n|    |\n|\n|    " + String.join(" ", p.Incorrectwords.toString()) + "\n\n\n" + String.join(" ", p.CorrectChars.toString()));
                 break;
@@ -66,8 +56,7 @@ import java.util.*;
                 break;
         }
     }
-
-    static void DoGameLoop(Playerdata p) {
+    static void DoGameLoop(Playerdata p) throws FileNotFoundException {
         Scanner scanner = new Scanner(System.in);
         while (!p.isCorrect && !p.isIncorrect) {
             boolean Correct = false;
@@ -81,8 +70,16 @@ import java.util.*;
                 }
             }
             if (!Correct) {
-                p.mistakes++;
-                p.Incorrectwords.add(key);
+                Boolean addmistake = true;
+                for (int i = 0; i < p.Incorrectwords.size(); i++)
+                {
+                 if (key == p.Incorrectwords.get(i))
+                addmistake = false;
+                }
+                if(addmistake == true) {
+                    p.mistakes++;
+                    p.Incorrectwords.add(key);
+                }
                 UpDateGame(p);
             }
             if (p.mistakes == 6) {
@@ -95,7 +92,7 @@ import java.util.*;
         GameEnd(p);
     }
 
-    static void Gamechoice(Playerdata p) {
+    static void Gamechoice(Playerdata p) throws FileNotFoundException {
         Scanner scanner = new Scanner(System.in);
         String GameChoice = scanner.nextLine();
         switch (GameChoice) {
@@ -108,11 +105,8 @@ import java.util.*;
                 break;
         }
     }
-
-    static void GameEnd(Playerdata p) {
+    static void GameEnd(Playerdata p) throws FileNotFoundException {
         if (p.isCorrect) {
-            System.out.print("\033[H\033[2J");
-            System.out.flush();
             System.out.println("Congratulations! you guessed the right word! The word was " + p.word + " \nDo you wish to play again? yes/no");
             Gamechoice(p);
         } else if (p.isIncorrect) {
@@ -122,4 +116,3 @@ import java.util.*;
         }
     }
 }
-
