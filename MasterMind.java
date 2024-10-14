@@ -12,7 +12,7 @@ public class MasterMind {
         public int BlackPegs = 0;
         public int WhitePegs = 0;
     }
-    public static void main(String[] args) {// bruh
+    public static void main(String[] args) {//
         GameData g = new GameData();
      //   System.out.println(g.Code);
        GamePlay(g);
