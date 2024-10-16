@@ -12,7 +12,7 @@ public class MasterMind {
         public int BlackPegs = 0;
         public int WhitePegs = 0;
     }
-    public static void main(String[] args) {//
+    public static void main(String[] args) {
         GameData g = new GameData();
      //   System.out.println(g.Code);
        GamePlay(g);
@@ -36,6 +36,7 @@ public class MasterMind {
     static void GamePlay(GameData g) {
         //  TakeInput(g);
         g.Code = "6684";
+
         System.out.println(g.Code);
         while (true) {
             Scanner scanner = new Scanner(System.in);
