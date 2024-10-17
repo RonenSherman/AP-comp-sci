@@ -4,6 +4,9 @@
 // LICENSE file in the root directory of this source tree.
 
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.List;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -35,13 +38,10 @@ public class MastermindTester {
             byte[] secretDigits = codeStringToBytes(codeword1);
             byte[] guessDigits = codeStringToBytes(codeword2);
 
-            // Note: this algorithm is weird and broken on purpose. Don't spend much time, if any,
-            // studying it. Replace it with your own!!
+
             int b = 0;
             int w = 0;
-            int used = 0;
-
-            List<Integer> list = new ArrayList<>();
+          /*  List<Integer> list = new ArrayList<>(); // code for - 82% success
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
                     if (guessDigits[i] == secretDigits[j] && secretDigits[j] != guessDigits[j] && !list.contains(j)  ) {
@@ -52,6 +52,25 @@ public class MastermindTester {
                 }
                 if (guessDigits[i] == secretDigits[i])
                     b++;
+            }*/
+            Boolean[] CheckedAns = { false, false, false, false };
+            Boolean[] CheckedInput = { false, false, false, false };
+            //   List<Boolean> list = CheckedInput.asList(CheckedInput);
+
+            for (int i = 0; i < 4; i++)
+            {
+                if ( secretDigits[i] == guessDigits[i])
+                    b+=1;  CheckedInput[i] = true;CheckedAns[i] = true;
+            }
+            for (int i = 0; i < 4; i++)
+            {
+                for (int j = 0; j < 4; j++)
+                {
+                    if ((secretDigits[j] == guessDigits[i]) && !CheckedAns[j] && !CheckedInput[i] && (i!=j)) {
+                        w+=1;
+                        CheckedInput[i] = true; CheckedAns[j] = true;
+                    }
+                }
             }
             // Return the hit counts in the order required!
             return new int[]{b, w};
