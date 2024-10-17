@@ -44,7 +44,7 @@ public class MastermindTester {
           /*  List<Integer> list = new ArrayList<>(); // code for - 82% success
             for (int i = 0; i < 4; i++) {
                 for (int j = 0; j < 4; j++) {
-                    if (guessDigits[i] == secretDigits[j] && secretDigits[j] != guessDigits[j] && !list.contains(j)  ) {
+                    if (guessDigits[i] == secretDigits[j] && secretDigits[j] != guessDigits[j] && !list.contains(j)  ) { 
                         list.add(j);
                         w++;
                         break;
@@ -55,14 +55,13 @@ public class MastermindTester {
             }*/
             Boolean[] CheckedAns = { false, false, false, false };
             Boolean[] CheckedInput = { false, false, false, false };
-            //   List<Boolean> list = CheckedInput.asList(CheckedInput);
-
+            
             for (int i = 0; i < 4; i++)
             {
                 if ( secretDigits[i] == guessDigits[i])
                     b+=1;  CheckedInput[i] = true;CheckedAns[i] = true;
             }
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++) // Swap black and white then run test 
             {
                 for (int j = 0; j < 4; j++)
                 {
