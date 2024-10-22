@@ -36,25 +36,33 @@ public class MasterMind {
     static void GamePlay(GameData g) {
         //  TakeInput(g);
         g.Code = "6684";
+        g.input = "4567";
+        int b = 0;
+        int w = 0;
+        int used = 0;
 
-        System.out.println(g.Code);
-        while (true) {
-            Scanner scanner = new Scanner(System.in);
-            g.input = scanner.nextLine();
-            List<Integer> list = new ArrayList<>();
-            for (int i = 0; i < g.input.length(); i++) {
-                for (int j = 0; j < g.input.length(); j++) {
-                    if (g.input.charAt(i) == g.Code.charAt(j) && g.Code.charAt(j) != g.input.charAt(j) && !list.contains(j)) {
-                        list.add(j);
-                        g.WhitePegs++;
-                        break;
-                    }
+        Boolean[] CheckedAns = { false, false, false, false };
+        Boolean[] CheckedInput = { false, false, false, false };
+        //   List<Boolean> list = CheckedInput.asList(CheckedInput);
+
+        for (int i = 0; i < 4; i++)
+        {
+            if ( g.Code.charAt(i) == g.input.charAt(i))
+                g.BlackPegs+=1;  CheckedInput[i] = true;CheckedAns[i] = true;
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                if ((g.Code.charAt(j) == g.input.charAt(i)) && !CheckedAns[j] && !CheckedInput[i] && (i!=j)) {
+                    w+=1;
+                    CheckedInput[i] = true; CheckedAns[j] = true;
                 }
-                if (g.input.charAt(i) == g.Code.charAt(i))
-                    g.BlackPegs++;
             }
+        }
+        // Return the hit counts in the order required!
+
             System.out.println(g.BlackPegs);
             System.out.println(g.WhitePegs);
         }
     }
-}
