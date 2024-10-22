@@ -4,6 +4,9 @@
 // LICENSE file in the root directory of this source tree.
 
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.List;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -35,23 +38,21 @@ public class MastermindTester {
             byte[] secretDigits = codeStringToBytes(codeword1);
             byte[] guessDigits = codeStringToBytes(codeword2);
 
-            // Note: this algorithm is weird and broken on purpose. Don't spend much time, if any,
-            // studying it. Replace it with your own!!
+
             int b = 0;
             int w = 0;
-            int used = 0;
+            List<Integer> list = new ArrayList<>(); // code for - 100% success - it finally works
 
-            List<Integer> list = new ArrayList<>();
             for (int i = 0; i < 4; i++) {
+                if (guessDigits[i] == secretDigits[i])
+                    b++;
                 for (int j = 0; j < 4; j++) {
-                    if (guessDigits[i] == secretDigits[j] && secretDigits[j] != guessDigits[j] && !list.contains(j)  ) {
+                    if ((guessDigits[i] == secretDigits[j]) && !list.contains(j) && secretDigits[j] != guessDigits[j] && secretDigits[i] != guessDigits[i]) {
                         list.add(j);
                         w++;
                         break;
                     }
                 }
-                if (guessDigits[i] == secretDigits[i])
-                    b++;
             }
             // Return the hit counts in the order required!
             return new int[]{b, w};
