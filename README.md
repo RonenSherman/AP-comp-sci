@@ -1,1 +1,1 @@
-All my work for AP computor science
+All my work for AP computer science
