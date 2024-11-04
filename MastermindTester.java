@@ -4,11 +4,8 @@
 // LICENSE file in the root directory of this source tree.
 
 import java.io.FileReader;
-import java.util.Arrays;
 import java.util.List;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 // This program tests students' solutions to the Mastermind scoring problem.
@@ -33,7 +30,7 @@ public class MastermindTester {
 
         // Return black hits (correct color and position) in [0] and white hits (correct color but wrong
         // position) in [1].
-        public int[] scoreCodewords(String codeword1, String codeword2) {
+        public int[] scoreCodewords(String codeword1, String codeword2) {// Ronen Sherman
             // This algorithm likes the codewords to be in byte arrays.
             byte[] secretDigits = codeStringToBytes(codeword1);
             byte[] guessDigits = codeStringToBytes(codeword2);
@@ -42,7 +39,6 @@ public class MastermindTester {
             int b = 0;
             int w = 0;
             List<Integer> list = new ArrayList<>(); // code for - 100% success - it finally works
-
             for (int i = 0; i < 4; i++) {
                 if (guessDigits[i] == secretDigits[i])
                     b++;
