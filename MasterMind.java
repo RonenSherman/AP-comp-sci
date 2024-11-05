@@ -10,9 +10,10 @@ public class MasterMind {
     public static class GameData {
         public String input = "";
         public String Code = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000 + 1));
-
         public boolean[] blackPegLocation = {false,false,false,false};
+        public boolean[] WhitePegLocation = {false,false,false,false};
        public char[] values = {'1','2','3','4'};
+       public char[] WhitePegValues = {'1','2','3','4'} ;
         public int BlackPegs = 0;
         public int guesses = 0;
         public int WhitePegs = 0;
@@ -22,16 +23,15 @@ public class MasterMind {
         GameData g = new GameData();
             while(!Objects.equals(g.input, g.Code))
             {
-                ComputerGuess(g);
+                GetGuess(g);
             }
     }
 
-   static void ComputerGuess(GameData g) {
+   static void GetGuess(GameData g) {
         g.guesses++;
         if(g.BlackPegs == 0)
         {
-            String InitialGuess = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000 + 1));
-            g.input = InitialGuess;
+            g.input = String.valueOf(ThreadLocalRandom.current().nextInt(1000, 10000 + 1));
             ScoringFunction(g);
 
         } else {
@@ -60,6 +60,8 @@ public class MasterMind {
             for (int j = 0; j < 4; j++) {
                 if ((g.input.charAt(i) == g.Code.charAt(j)) && !list.contains(j) && g.Code.charAt(j) != g.input.charAt(j) && g.Code.charAt(i) != g.input.charAt(i)) {
                     list.add(j);
+                    g.WhitePegLocation[j] = true;
+                    g.WhitePegValues[j] = g.input.charAt(j);
                     g.WhitePegs++;
                     break;
                 }
