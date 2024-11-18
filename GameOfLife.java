@@ -1,18 +1,18 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.*;
+import java.util.EventListener;
 
 public class GameOfLife {
 
     public static void main(String[] args)
     {
+
+
+
+
         GameOfLife();
-        // makeGui();
+       //  makeGui();
     }
 
     static void makeGui()
@@ -26,6 +26,7 @@ public class GameOfLife {
         JButton button1 = new JButton();
         button1.setText("New game of life");
         button1.setPreferredSize(new Dimension(300, 100));
+        button1.addActionListener(new StartsGame());
         frame.add(button1);
         frame.setVisible(true);
 
@@ -33,23 +34,29 @@ public class GameOfLife {
     static void GameOfLife()
     {
 
-        int rows = 10;
-        int columns = 10;
-        boolean Matrix[][] = new boolean[rows][columns];
-        java.util.Arrays.fill(Matrix[0], false);
-        java.util.Arrays.fill(Matrix[1], false);
+        DrawingPanel panel = new DrawingPanel(600, 400);
+        Graphics g = panel.getGraphics();
+        g.setColor(Color.BLACK);
+        panel.setVisible(true);
 
+            int rows = 50;
+        int columns = 50;
+        boolean Grid[][] = new boolean[rows][columns];
+        java.util.Arrays.fill(Grid[0], false);
+        java.util.Arrays.fill(Grid[1], false);
 
+        
 
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
-                if (Matrix[i][j]) {
-                    System.out.print(" ■ "); // if true
+                if (Grid[i][j]) {
+                 //   textArea.append(" ■ "); // if true
                 } else {
-                    System.out.print(" ▢ "); // if false
+                   // textArea.append(" ▢ "); // if false
+                    g.fillRect(i,j,15,15);
                 }
             }
-            System.out.println();
+          //  g.fillRect(i,j,15,15);
         }
     }
 
@@ -77,6 +84,12 @@ public class GameOfLife {
         @Override
         public void mouseExited(MouseEvent e) {
 
+        }
+    }
+    public static class StartsGame implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            GameOfLife();
         }
     }
 }
