@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.EventListener;
 
-public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java swing
+public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java swing 
 
     public static void main(String[] args)
     {
@@ -11,7 +11,7 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
 
 
 
-        GameOfLife();
+        GameOfLife(); //starts the game
        //  makeGui();
     }
 
