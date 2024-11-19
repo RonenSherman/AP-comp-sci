@@ -36,18 +36,16 @@ public class GameOfLife {
 
         DrawingPanel panel = new DrawingPanel(600, 400);
         Graphics g = panel.getGraphics();
+        panel.addMouseListener(new SetLiveCells());
         g.setColor(Color.BLACK);
         panel.setVisible(true);
 
             int rows = 50;
         int columns = 50;
         boolean Grid[][] = new boolean[rows][columns];
-        java.util.Arrays.fill(Grid[0], false);
-        java.util.Arrays.fill(Grid[1], false);
 
-        
 
-        for (int i = 0; i < rows; i++) {
+       /* for (int i = 0; i < rows; i++) {
             for (int j = 0; j < columns; j++) {
                 if (Grid[i][j]) {
                  //   textArea.append(" ■ "); // if true
@@ -57,6 +55,16 @@ public class GameOfLife {
                 }
             }
           //  g.fillRect(i,j,15,15);
+        }*/
+        int size = 12;
+        for (int i = 0; i < Grid.length ;i ++) {
+            for (int j = 0; j < Grid[i].length; j ++) {
+                if(!Grid[i][j]) {
+                    g.fillRect(i*size, j*size, size - 1, size - 1);
+                }else {
+                    g.drawRect(i*size, j*size, size, size);
+                }
+            }
         }
     }
 
