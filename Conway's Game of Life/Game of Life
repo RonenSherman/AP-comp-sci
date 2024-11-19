@@ -15,7 +15,7 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
        //  makeGui();
     }
 
-    static void makeGui()
+    static void makeGui() // creates gui
     {
         JFrame frame = new JFrame("Conway's Game of Life");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
