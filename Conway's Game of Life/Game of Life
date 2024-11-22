@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.EventListener;
 
-public class GameOfLife {
+public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java swing 
 
     public static void main(String[] args)
     {
@@ -11,11 +11,11 @@ public class GameOfLife {
 
 
 
-        GameOfLife();
+        GameOfLife(); //starts the game
        //  makeGui();
     }
 
-    static void makeGui()
+    static void makeGui() // creates gui
     {
         JFrame frame = new JFrame("Conway's Game of Life");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
