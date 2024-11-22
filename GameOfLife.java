@@ -31,44 +31,46 @@ public class GameOfLife {
         frame.setVisible(true);
 
     }
-    static void GameOfLife()
-    {
+    static void GameOfLife() {
 
-        DrawingPanel panel = new DrawingPanel(600, 400);
+
+        DrawingPanel panel = new DrawingPanel(700, 500);
         Graphics g = panel.getGraphics();
         panel.addMouseListener(new SetLiveCells());
         g.setColor(Color.BLACK);
         panel.setVisible(true);
 
-            int rows = 50;
-        int columns = 50;
+        int rows = 500;
+        int columns = 500;
         boolean Grid[][] = new boolean[rows][columns];
 
 
-       /* for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
+        int size = 12; // initial print
+        for (int i = 0; i < Grid.length; i++) {
+            for (int j = 0; j < Grid.length; j++) {
                 if (Grid[i][j]) {
-                 //   textArea.append(" ■ "); // if true
+
                 } else {
-                   // textArea.append(" ▢ "); // if false
-                    g.fillRect(i,j,15,15);
+                    g.fillRect(i * size, j * size, size, size);
                 }
             }
-          //  g.fillRect(i,j,15,15);
-        }*/
-        int size = 12;
-        for (int i = 0; i < Grid.length ;i ++) {
-            for (int j = 0; j < Grid[i].length; j ++) {
-                if(!Grid[i][j]) {
-                    g.fillRect(i*size, j*size, size - 1, size - 1);
-                }else {
-                    g.drawRect(i*size, j*size, size, size);
+        }
+
+        while (true) // will add start and stop using keylistener
+        {
+            int TrueCount = 0;
+            for (int x = 0; x < Grid.length; x++) {
+                for (int y = 0; y < Grid.length; y++) {
+                    if(Grid[x][y] )  { Grid[x+1][y+4] = true;} // need to make this without 30 if/elses
                 }
             }
         }
     }
 
+
     public static class SetLiveCells implements MouseListener {
+
+        public void SelectLiveCell(){}
         @Override
         public void mouseClicked(MouseEvent e) {
 
