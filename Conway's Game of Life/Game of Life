@@ -5,12 +5,12 @@ import java.awt.event.*;
 public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java swing 
 
     public static void main(String[] args) throws InterruptedException {
-        int columns = 50;
-        int rows = 50;
-        int[][] Grid = new int[rows][columns];
+        int w = 500;
+        int h = 500;
+        int[][] Grid = new int[w][h];
 
 
-        StartGameOfLife(columns, rows, Grid); //starts the game
+        StartGameOfLife(w, h, Grid); //starts the game
         //  makeGui();
     }
 
@@ -33,27 +33,34 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
 
     static void StartGameOfLife(int x, int y, int[][] Grid) throws InterruptedException {
 
-        DrawingPanel panel = new DrawingPanel(600, 400);
+        DrawingPanel panel = new DrawingPanel(6000, 4000);
         Graphics g = panel.getGraphics();
         panel.addMouseListener(new SetLiveCells());
         g.setColor(Color.BLACK);
         panel.setVisible(true);
+        panel.setGridLines(true);
 
 
         Grid[10][10]=1;
-        Grid[11][10]=1;
+        Grid[10][9]=1;
+        Grid[9][10]=1;
+        Grid[10][11]=1;
         Grid[11][11]=1;
-        Grid[12][10]=1;
-        Grid[10][12]=1;
+
+
+
+
         int size = 12;
 
         while (true) {
             for (int i = 0; i < Grid.length; i++) {
                 for (int j = 0; j < Grid.length; j++) {
                     if (Grid[i][j] == 0) {
+                        g.setColor(Color.BLACK);
                         g.fillRect(i * size, j * size, size, size);
                     } else {
-                        g.drawRect(i * size, j * size, size, size);
+                        g.setColor(Color.WHITE);
+                        g.fillRect(i * size, j * size, size, size);
                     }
                 }
             }
@@ -68,30 +75,37 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
            int[][] OutputM = new int [Grid.length][Grid.length];
             for (int i = 0; i < Grid.length; i++) {
                 for (int j = 0; j < Grid[i].length; j++) {
-                    int sum = Value(i - 1, j + 1, Grid)
-                            + Value(i + 1, j + 1, Grid)
-                            + Value(i - 1, j - 1, Grid)
-                            + Value(i + 1, j - 1, Grid)
-                            + Value(i - 1, j, Grid)
-                            + Value(i, j + 1, Grid)
-                            + Value(i, j - 1, Grid)
-                            + Value(i - 1, j - 1, Grid);
-                    if (sum == 2 || sum == 3) {
+                    if(i == 1 && j == 1)
+                        System.out.println("tehee");
+                    int sum =
+                            Value(i, j + 1, Grid,Grid.length)
+                          + Value(i, j - 1, Grid,Grid.length)
+                                    + Value(i - 1, j, Grid,Grid.length)
+                            + Value(i - 1, j + 1, Grid,Grid.length)
+                                    + Value(i - 1, j - 1, Grid,Grid.length)
+                            + Value(i + 1, j + 1, Grid,Grid.length )
+                            + Value(i + 1, j - 1, Grid,Grid.length)
+                            + Value(i + 1, j, Grid,Grid.length);
+                    if ((sum == 2 || sum == 3) && Grid[i][j] == 1 ) {
                         OutputM[i][j] = 1;
-                    } else {
+                    }  else if( sum == 3 && Grid[i][j] == 0 )
+                    {
+                        OutputM[i][j] = 1;
+                    }
+                    else {
                         OutputM[i][j] = 0;
                     }
                 }
             }
                      Grid = OutputM;
-            Thread.sleep(100);
+           // Thread.sleep(1000);
         }
 
     }
 
 
-    public static int Value(int x, int y, int[][] Grid) {
-        if (x < 0 || x >= 49 || y >= 49 || y < 0) {
+    public static int Value(int x, int y, int[][] Grid, int w) {
+        if (x < 0 || x >= w -1 || y >= w - 1 || y < 0) {
             return 0;
         } else {
             return Grid[x][y];
