@@ -1,18 +1,17 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.EventListener;
 
 public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java swing 
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws InterruptedException {
+        int columns = 50;
+        int rows = 50;
+        int[][] Grid = new int[rows][columns];
 
 
-
-
-        GameOfLife(); //starts the game
-       //  makeGui();
+        StartGameOfLife(columns, rows, Grid); //starts the game
+        //  makeGui();
     }
 
     static void makeGui() // creates gui
@@ -31,8 +30,8 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
         frame.setVisible(true);
 
     }
-    static void GameOfLife()
-    {
+
+    static void StartGameOfLife(int x, int y, int[][] Grid) throws InterruptedException {
 
         DrawingPanel panel = new DrawingPanel(600, 400);
         Graphics g = panel.getGraphics();
@@ -40,31 +39,62 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
         g.setColor(Color.BLACK);
         panel.setVisible(true);
 
-            int rows = 50;
-        int columns = 50;
-        boolean Grid[][] = new boolean[rows][columns];
 
-
-       /* for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < columns; j++) {
-                if (Grid[i][j]) {
-                 //   textArea.append(" ■ "); // if true
-                } else {
-                   // textArea.append(" ▢ "); // if false
-                    g.fillRect(i,j,15,15);
-                }
-            }
-          //  g.fillRect(i,j,15,15);
-        }*/
+        Grid[10][10]=1;
+        Grid[11][10]=1;
+        Grid[11][11]=1;
+        Grid[12][10]=1;
+        Grid[10][12]=1;
         int size = 12;
-        for (int i = 0; i < Grid.length ;i ++) {
-            for (int j = 0; j < Grid[i].length; j ++) {
-                if(!Grid[i][j]) {
-                    g.fillRect(i*size, j*size, size - 1, size - 1);
-                }else {
-                    g.drawRect(i*size, j*size, size, size);
+
+        while (true) {
+            for (int i = 0; i < Grid.length; i++) {
+                for (int j = 0; j < Grid.length; j++) {
+                    if (Grid[i][j] == 0) {
+                        g.fillRect(i * size, j * size, size, size);
+                    } else {
+                        g.drawRect(i * size, j * size, size, size);
+                    }
                 }
             }
+
+/*Create a function that will use two arrays (array int[-1,0,1]) for x and y representing all adjacent cells
+  use two nested for loops to iterate over this array and check each cell int[1][1] ect… -1 represents previous cell,
+  1 represents next cell, zero represents current cell, we use this to find how many live neighbors each cell will have.
+  iterate over the main matrix and use the data and call the above function to find out how the cell will change.
+. We can save the output into an output matrix that we can send to the main matrix when we reprint the main matrix.
+ */
+         // Iterates over main matrix of live and dead cells
+           int[][] OutputM = new int [Grid.length][Grid.length];
+            for (int i = 0; i < Grid.length; i++) {
+                for (int j = 0; j < Grid[i].length; j++) {
+                    int sum = Value(i - 1, j + 1, Grid)
+                            + Value(i + 1, j + 1, Grid)
+                            + Value(i - 1, j - 1, Grid)
+                            + Value(i + 1, j - 1, Grid)
+                            + Value(i - 1, j, Grid)
+                            + Value(i, j + 1, Grid)
+                            + Value(i, j - 1, Grid)
+                            + Value(i - 1, j - 1, Grid);
+                    if (sum == 2 || sum == 3) {
+                        OutputM[i][j] = 1;
+                    } else {
+                        OutputM[i][j] = 0;
+                    }
+                }
+            }
+                     Grid = OutputM;
+            Thread.sleep(100);
+        }
+
+    }
+
+
+    public static int Value(int x, int y, int[][] Grid) {
+        if (x < 0 || x >= 49 || y >= 49 || y < 0) {
+            return 0;
+        } else {
+            return Grid[x][y];
         }
     }
 
@@ -94,10 +124,11 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
 
         }
     }
+
     public static class StartsGame implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            GameOfLife();
+          //  StartGameOfLife();
         }
     }
 }
