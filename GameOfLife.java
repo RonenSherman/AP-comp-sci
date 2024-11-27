@@ -60,7 +60,7 @@ public class GameOfLife { // Ronen Sherman - Conway's Game of Life using  java s
         Grid[110][111] = 1;
         Grid[111][111] = 1;
 
-    Boolean Done = false;
+    Boolean Done = false;//
         int size = 12;
     while(!Done) {
             while (DoGame) {
