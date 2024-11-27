@@ -225,7 +225,6 @@ import javax.swing.filechooser.FileFilter;
  *
  * <pre>
  * // example of attaching a mouse click handler using Java 8
- * panel.onClick( (x, y) -&gt; System.out.println(x + " " + y) );
  * </pre>
 
  * <h3>Debugging facilities (new in BJP 4th edition):</h3>
