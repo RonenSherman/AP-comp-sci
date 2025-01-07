@@ -13,7 +13,7 @@ public class MazeGeneration {
     }
 
 
-    public static void GenerateMaze(Graphics g) {
+    public static void GenerateMaze(Graphics g) {//
         // dimensions of generated maze
         int rows = 100, columns = 100;
 
@@ -27,46 +27,63 @@ public class MazeGeneration {
 
         // select random point and open as start node
         Random r = new Random();
-       Point.x = r.nextInt(100) + 1;
-        Point.y = r.nextInt(100) + 1;
-        maze[Point.x][Point.y ] = 'S';
-        PrintCells(g, maze);
+        Point st = new Point();
+       st.x = r.nextInt(100) + 1;
+        st.y = r.nextInt(100) + 1;
+        maze[st.x][st.y ] = 'S';
+        List<Point> FrontierCells = new ArrayList<>() {};
+        for (int x = -1; x <= 1; x++)
+            for (int y = -1; y <= 1; y++) {
+                if (x == 0 && y == 0 || x != 0 && y != 0)
+                    continue;
+                try {
+                    if (maze[st.x + x][st.y + y] == '.') continue;
+                } catch (Exception e) { // ignore ArrayIndexOutOfBounds
+                    continue;
+                }
+                // add eligible points to frontier
+                FrontierCells.add(new Point(st.x + x, st.y + y, st));
+            }
+        PrintCells(g,maze);
+
+
+
     }
 
     public static void ComputeFrontierCells() {  //finding all the next points
 
-        List<Point> FrontierCells = new ArrayList<Point>() {};
-            FrontierCells.add (Point.x Point.y + 1);
 
-                    (Point.x,  Point.y + 1);
+         //   FrontierCells.add
 
 
-                + (Point.x,  Point.y - 1)
-        +(Point.x - 1,  Point.y)
-        +(Point.x - 1,  Point.y + 1)
-        +(Point.x - 1,  Point.y - 1)
-        +(Point.x + 1,  Point.y + 1)
-        +(Point.x + 1,  Point.y - 1)
-        +(Point.x + 1,  Point.y);
+
+
     }
 
     public static void PrintCells(Graphics g, char[][] maze) {
-        for (int i = 0; i < maze.length; i++) {// iterates over the matrix and prints it
+        for (int i = 0; i < maze.length; i++) {// iterates over the maze and prints it
             for (int j = 0; j < maze.length; j++) {
                 if (maze[i][j] == 'W') {
-                    g.setColor(Color.BLACK);// dead cells
+                    g.setColor(Color.BLACK);
                     g.fillRect(i * 10, j * 10, 10, 10);
                 } else {
-                    g.setColor(Color.WHITE);// living cells
+                    g.setColor(Color.WHITE);
                     g.fillRect(i * 10, j * 10, 10, 10);
                 }
             }
         }
     }
 
-     public static class Point {
-        static int x,y;
+      public static class Point {
+         int x,y;
 
         boolean inMaze;
-    }
+
+          public Point(int x, int y, Point st) {
+          }
+
+          public Point() {
+
+          }
+      }
 }
