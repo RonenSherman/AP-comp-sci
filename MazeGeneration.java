@@ -28,36 +28,56 @@ public class MazeGeneration {
         // select random point and open as start node
         Random r = new Random();
         Point st = new Point();
-       st.x = r.nextInt(100) + 1;
+        st.x = r.nextInt(100) + 1;
         st.y = r.nextInt(100) + 1;
-        maze[st.x][st.y ] = 'S';
-        List<Point> FrontierCells = new ArrayList<>() {};
+        maze[st.x][st.y] = 'S';
+        ComputeFrontierCells(maze, st);
+
+        //  Point last = null;
+        while (!FrontierCells.isEmpty()) {
+
+            // pick current node at random
+            Point cu = FrontierCells.remove((int) (Math.random() * FrontierCells.size()));
+            Point op = cu.opposite();
+            try {
+                // if both node and its opposite are walls
+                if (maze[cu.x][cu.y] == '*') {
+                    if (maze[op.x][op.y] == '*') {
+
+                        // open path between the nodes
+                        maze[cu.x][cu.y] = '.';
+                        maze[op.x][op.y] = '.';
+
+                        // store last node in order to mark it later
+                        last = op;
+
+
+                        //  PrintCells(g,maze);
+
+
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public static void ComputeFrontierCells(char[][] maze, Point st) {  //finding all the next points
+        List<Point> FrontierCells = new ArrayList<>() {
+        };
         for (int x = -1; x <= 1; x++)
             for (int y = -1; y <= 1; y++) {
                 if (x == 0 && y == 0 || x != 0 && y != 0)
                     continue;
                 try {
-                    if (maze[st.x + x][st.y + y] == '.') continue;
-                } catch (Exception e) { // ignore ArrayIndexOutOfBounds
+                    if (maze[st.x + x][st.y + y] != 'W') continue;
+                } catch (Exception e) { // make sure it is in bounds
                     continue;
                 }
-                // add eligible points to frontier
+                // add allowed points to frontier
                 FrontierCells.add(new Point(st.x + x, st.y + y, st));
             }
-        PrintCells(g,maze);
-
-
-
-    }
-
-    public static void ComputeFrontierCells() {  //finding all the next points
-
-
-         //   FrontierCells.add
-
-
-
-
     }
 
     public static void PrintCells(Graphics g, char[][] maze) {
@@ -74,16 +94,17 @@ public class MazeGeneration {
         }
     }
 
-      public static class Point {
-         int x,y;
+    public static class Point {
+        int x, y;
 
-        boolean inMaze;
+        public Point(int x, int y, Point st) {
+        }
 
-          public Point(int x, int y, Point st) {
-          }
+        public Point() {
 
-          public Point() {
-
-          }
-      }
+        }
+    }
 }
+
+
+
