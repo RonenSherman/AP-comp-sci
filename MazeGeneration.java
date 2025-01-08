@@ -25,45 +25,19 @@ public class MazeGeneration {
         char[][] maze = new char[rows][columns];
         for (int x = 0; x < rows; x++) maze[x] = s.toString().toCharArray();
 
-        // select random point and open as start node
+        // select random point and make it start node
         Random r = new Random();
-        Point st = new Point();
-        st.x = r.nextInt(100) + 1;
-        st.y = r.nextInt(100) + 1;
-        maze[st.x][st.y] = 'S';
-        ComputeFrontierCells(maze, st);
-
-        //  Point last = null;
-        while (!FrontierCells.isEmpty()) {
-
-            // pick current node at random
-            Point cu = FrontierCells.remove((int) (Math.random() * FrontierCells.size()));
-            Point op = cu.opposite();
-            try {
-                // if both node and its opposite are walls
-                if (maze[cu.x][cu.y] == '*') {
-                    if (maze[op.x][op.y] == '*') {
-
-                        // open path between the nodes
-                        maze[cu.x][cu.y] = '.';
-                        maze[op.x][op.y] = '.';
-
-                        // store last node in order to mark it later
-                        last = op;
+        Point starting = new Point();
+        starting.x = r.nextInt(100) + 1;
+        starting.y = r.nextInt(100) + 1;
+        maze[starting.x][starting.y] = 'S';
+        ComputeFrontierCells(maze, starting);
 
 
-                        //  PrintCells(g,maze);
-
-
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
+         PrintCells(g,maze);
     }
 
-    public static void ComputeFrontierCells(char[][] maze, Point st) {  //finding all the next points
+    public static List<Point> ComputeFrontierCells(char[][] maze, Point starting) {  //finding all the next points
         List<Point> FrontierCells = new ArrayList<>() {
         };
         for (int x = -1; x <= 1; x++)
@@ -71,13 +45,40 @@ public class MazeGeneration {
                 if (x == 0 && y == 0 || x != 0 && y != 0)
                     continue;
                 try {
-                    if (maze[st.x + x][st.y + y] != 'W') continue;
+                    if (maze[starting.x + x][starting.y + y] != 'W') continue;
                 } catch (Exception e) { // make sure it is in bounds
                     continue;
                 }
-                // add allowed points to frontier
-                FrontierCells.add(new Point(st.x + x, st.y + y, st));
+                // add legal points to frontier of next points
+                FrontierCells.add(new Point(starting.x + x, starting.y + y, starting));
             }
+        return FrontierCells;
+    }
+
+
+    public void IDontKnow( List<Point> FrontierCells,char[][] maze){
+          Point last = null;
+        while (!FrontierCells.isEmpty()) {
+
+            // pick current node at random
+            Point current = FrontierCells.remove((int) (Math.random() * FrontierCells.size()));
+            Point opposite = current.opposite(current);
+            try {
+                if (maze[current.x][current.y] == 'W') {
+                    if (maze[opposite.x][opposite.y] == 'W') {
+
+
+                        maze[current.x][current.y] = 'P';
+                        maze[opposite.x][opposite.y] = 'P';
+
+
+                        last = opposite;
+                    }
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     public static void PrintCells(Graphics g, char[][] maze) {
@@ -94,14 +95,19 @@ public class MazeGeneration {
         }
     }
 
-    public static class Point {
+    public static class Point { // original point class Eric's is a copy
         int x, y;
 
-        public Point(int x, int y, Point st) {
+        public Point(int x, int y, Point starting) {
         }
 
         public Point() {
 
+        }
+
+        public Point opposite( Point current) {
+         //   Point opposite = current.x
+            return null;
         }
     }
 }
