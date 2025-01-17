@@ -156,7 +156,7 @@ import java.util.List;
             stack1 = new Stack();
         }
 
-        public char[][]  depthFirstSearch(char[][] maze)
+        public char[][]  depthFirstSearch(char[][] maze)//
         {
 
 
