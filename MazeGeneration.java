@@ -1,116 +1,166 @@
-import java.awt.*;
-import java.util.*;
+
+    import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
+    import java.util.Stack;
 
-public class MazeGeneration {
 
-    public static void main(String[] args) {
-        DrawingPanel panel = new DrawingPanel(1000, 1000);
+    public class MazeGeneration {
+    public static void main(String args[]) { // Ronen Sherman maze generation using iterative prims algorithm without recursion, only one way to solve the maze
+        // Create a drawing panel for visualization
+        DrawingPanel panel = new DrawingPanel(1000, 600);
         Graphics g = panel.getGraphics();
         panel.setVisible(true);
-        GenerateMaze(g);
 
+        // Generate and render the maze
+        GenerateMaze(g);
+        
     }
 
+    public static void GenerateMaze(Graphics g) {
+        // Define maze dimensions (rows and columns)
+        int rows = 60, columns = 100;
 
-    public static void GenerateMaze(Graphics g) {//
-        // dimensions of generated maze
-        int rows = 100, columns = 100;
-
-        // create grid of walls
-        // W = wall, P = path, S = starting point
+        // Create an initial grid filled with walls
+        // 'W' represents walls, 'P' represents paths, 'S' is the start, and 'E' is the endpoint
         StringBuilder s = new StringBuilder(columns);
-        for (int x = 0; x < columns; x++)
-            s.append('W');
+        s.append("W".repeat(columns)); // Fill each row with 'W'
         char[][] maze = new char[rows][columns];
         for (int x = 0; x < rows; x++) maze[x] = s.toString().toCharArray();
 
-        // select random point and make it start node
-        Random r = new Random();
-        Point starting = new Point();
-        starting.x = r.nextInt(100) + 1;
-        starting.y = r.nextInt(100) + 1;
+        // Randomly select a starting point and mark it with 'S'
+        Point starting = new Point((int) (Math.random() * rows), (int) (Math.random() * columns), null);
         maze[starting.x][starting.y] = 'S';
-        ComputeFrontierCells(maze, starting);
 
-
-         PrintCells(g,maze);
+        // Begin generating the maze starting from the chosen point
+        ComputeFrontierCells(maze, starting, g);
     }
 
-    public static List<Point> ComputeFrontierCells(char[][] maze, Point starting) {  //finding all the next points
-        List<Point> FrontierCells = new ArrayList<>() {
-        };
-        for (int x = -1; x <= 1; x++)
+    public static void ComputeFrontierCells(char[][] maze, Point starting, Graphics g) {
+        // List to track frontier cells (potential cells to carve paths to)
+        List<Point> FrontierCells = new ArrayList<>();
+
+        // Add initial frontier cells around the starting point
+        for (int x = -1; x <= 1; x++) {
             for (int y = -1; y <= 1; y++) {
-                if (x == 0 && y == 0 || x != 0 && y != 0)
-                    continue;
-                try {
-                    if (maze[starting.x + x][starting.y + y] != 'W') continue;
-                } catch (Exception e) { // make sure it is in bounds
-                    continue;
+                // Skip the current cell and diagonal neighbors
+                if ((x == 0 && y == 0) || (x != 0 && y != 0)) continue;
+
+                // Calculate neighbor coordinates
+                int nx = starting.x + x;
+                int ny = starting.y + y;
+
+                // Add neighbors that are within bounds and are walls
+                if (isInBounds(maze, nx, ny) && maze[nx][ny] == 'W') {
+                    FrontierCells.add(new Point(nx, ny, starting));
                 }
-                // add legal points to frontier of next points
-                FrontierCells.add(new Point(starting.x + x, starting.y + y, starting));
             }
-        return FrontierCells;
-    }
+        }
 
+        Point last = null; // Keep track of the last processed cell
 
-    public void IDontKnow( List<Point> FrontierCells,char[][] maze){
-          Point last = null;
+        // Process all frontier cells
         while (!FrontierCells.isEmpty()) {
-
-            // pick current node at random
+            // Randomly select a frontier cell
             Point current = FrontierCells.remove((int) (Math.random() * FrontierCells.size()));
-            Point opposite = current.opposite(current);
-            try {
-                if (maze[current.x][current.y] == 'W') {
-                    if (maze[opposite.x][opposite.y] == 'W') {
 
+            // Determine the opposite cell in the direction from the parent
+            Point opposite = current.opposite();
 
-                        maze[current.x][current.y] = 'P';
-                        maze[opposite.x][opposite.y] = 'P';
+            // Check if the opposite cell is valid and carve the path
+            if (isInBounds(maze, opposite.x, opposite.y) && maze[current.x][current.y] == 'W' && maze[opposite.x][opposite.y] == 'W') {
+                // Mark the current and opposite cells as part of the path
+                maze[current.x][current.y] = 'P';
+                maze[opposite.x][opposite.y] = 'P';
 
+                // Update the last processed cell
+                last = opposite;
 
-                        last = opposite;
+                // Add new frontier cells around the opposite cell
+                for (int x = -1; x <= 1; x++) {
+                    for (int y = -1; y <= 1; y++) {
+                        if ((x == 0 && y == 0) || (x != 0 && y != 0)) continue;
+                        int nx = opposite.x + x;
+                        int ny = opposite.y + y;
+                        if (isInBounds(maze, nx, ny) && maze[nx][ny] == 'W') {
+                            FrontierCells.add(new Point(nx, ny, opposite));
+                        }
                     }
                 }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
             }
+            // Render the maze after processing each step
+            PrintCells(g, maze);
+        }
+
+        // Set the endpoint as the last processed cell, if available
+        if (last != null) {
+            maze[last.x][last.y] = 'E'; // Mark the endpoint
+            PrintCells(g, maze); // Render the maze with the endpoint
         }
     }
 
+    // Utility function to check if a given cell is within the maze bounds
+    private static boolean isInBounds(char[][] maze, int x, int y) {
+        return x >= 0 && x < maze.length && y >= 0 && y < maze[0].length;
+    }
+
+    // Function to render the maze on the panel
     public static void PrintCells(Graphics g, char[][] maze) {
-        for (int i = 0; i < maze.length; i++) {// iterates over the maze and prints it
-            for (int j = 0; j < maze.length; j++) {
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[i].length; j++) {
+                // Set the color based on the cell type
                 if (maze[i][j] == 'W') {
-                    g.setColor(Color.BLACK);
-                    g.fillRect(i * 10, j * 10, 10, 10);
+                    g.setColor(Color.BLACK); // Walls
+                } else if (maze[i][j] == 'S') {
+                    g.setColor(Color.GREEN); // Start point
+                } else if (maze[i][j] == 'E') {
+                    g.setColor(Color.RED); // Endpoint
                 } else {
-                    g.setColor(Color.WHITE);
-                    g.fillRect(i * 10, j * 10, 10, 10);
+                    g.setColor(Color.WHITE); // Path
                 }
+                // Draw the cell as a rectangle
+                g.fillRect(j * 10, i * 10, 10, 10);
+                // (j, i) ensures correct location in reference with DrawingPanel (the graphic display)
             }
         }
     }
 
-    public static class Point { // original point class Eric's is a copy
-        int x, y;
+    // Class representing a point in the maze
+    public static class Point {
+        Integer x, y; // Coordinates of the point
+        Point parent; // Reference to the parent point (used to calculate opposite points)
 
-        public Point(int x, int y, Point starting) {
+        public Point(int r, int c, Point p) {
+            parent = p; // Set the parent point
+            this.x = r; // Row
+            this.y = c; // Column
         }
 
-        public Point() {
+        // Compute the opposite cell relative to the parent
+        public Point opposite() {
+            if (this.x.compareTo(parent.x) != 0) {
+                return new Point(this.x + this.x.compareTo(parent.x), this.y, this);
+            }
+            if (this.y.compareTo(parent.y) != 0) {
+                return new Point(this.x, this.y + this.y.compareTo(parent.y), this);
+            }
+            return null; // Return null if there is no valid opposite
+        }
+    }
 
+    public static class DFS
+    {
+        Stack stack1;
+        public DFS()
+        {
+            stack1 = new Stack();
         }
 
-        public Point opposite( Point current) {
-         //   Point opposite = current.x
-            return null;
+        public char[][]  depthFirstSearch(char[][] maze)
+        {
+
+
+            return maze;
         }
     }
 }
-
-
-
