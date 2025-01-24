@@ -1,8 +1,10 @@
 
-    import java.awt.*;
+import javax.swing.tree.TreeNode;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-    import java.util.Stack;
+import java.util.Stack;
+import java.util.TreeSet;
 
 
     public class MazeGeneration {
@@ -14,7 +16,8 @@ import java.util.List;
 
         // Generate and render the maze
         GenerateMaze(g);
-        
+
+
     }
 
     public static void GenerateMaze(Graphics g) {
@@ -34,6 +37,8 @@ import java.util.List;
 
         // Begin generating the maze starting from the chosen point
         ComputeFrontierCells(maze, starting, g);
+        int n = 1;
+        depthFirstSearch.arrayToTree(maze, n );
     }
 
     public static void ComputeFrontierCells(char[][] maze, Point starting, Graphics g) {
@@ -125,6 +130,7 @@ import java.util.List;
         }
     }
 
+
     // Class representing a point in the maze
     public static class Point {
         Integer x, y; // Coordinates of the point
@@ -145,22 +151,6 @@ import java.util.List;
                 return new Point(this.x, this.y + this.y.compareTo(parent.y), this);
             }
             return null; // Return null if there is no valid opposite
-        }
-    }
-
-    public static class DFS
-    {
-        Stack stack1;
-        public DFS()
-        {
-            stack1 = new Stack();
-        }
-
-        public char[][]  depthFirstSearch(char[][] maze)//
-        {
-
-
-            return maze;
         }
     }
 }
