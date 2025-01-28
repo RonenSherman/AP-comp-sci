@@ -5,8 +5,8 @@ import java.awt.event.*;
 
 public class GUI extends Frame implements KeyListener {
 
-    private TextField textField;
-    private Label displayLabel;
+    private final TextField textField;
+    private final Label displayLabel;
 
     // Constructor
     public GUI() {

@@ -731,8 +731,8 @@ public final class DrawingPanel implements ImageObserver {
     private ImagePanel imagePanel;         // real drawing surface
     private int currentZoom = 1;           // panel's zoom factor for drawing
     private int gridLinesPxGap = GRID_LINES_PX_GAP_DEFAULT;   // px between grid lines
-    private int initialPixel;              // initial value in each pixel, for clear()
-    private int instanceNumber;            // every DPanel has a unique number
+    private final int initialPixel;              // initial value in each pixel, for clear()
+    private final int instanceNumber;            // every DPanel has a unique number
     private int width;                     // dimensions of window frame
     private int height;                    // dimensions of window frame
     private JFileChooser chooser;          // file chooser to save files
@@ -740,7 +740,7 @@ public final class DrawingPanel implements ImageObserver {
     private JLabel statusBar;              // status bar showing mouse position
     private JPanel panel;                  // overall drawing surface
     private long createTime;               // time at which DrawingPanel was constructed
-    private Map<String, Integer> counts;   // new field to support DebuggingGraphics
+    private final Map<String, Integer> counts;   // new field to support DebuggingGraphics
     private MouseInputListener mouseListener;
     private String callingClassName;       // name of class that constructed this panel
     private Timer timer;                   // animation timer
@@ -1101,7 +1101,6 @@ public final class DrawingPanel implements ImageObserver {
                         "No valid web files found to compare against.",
                         "Error: no web files found",
                         JOptionPane.ERROR_MESSAGE);
-                return;
             } else {
                 String fileURL = null;
                 if (filenames.size() == 1) {
@@ -1533,7 +1532,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseClick(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "click");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1545,7 +1544,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseDown(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "press");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1557,7 +1556,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseDrag(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "drag");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1569,7 +1568,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseEnter(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "enter");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1581,7 +1580,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseExit(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "exit");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1593,7 +1592,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseMove(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "move");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -1605,7 +1604,7 @@ public final class DrawingPanel implements ImageObserver {
     public void onMouseUp(DPMouseEventHandler e) {
         ensureNotNull("event handler", e);
         DPMouseEventHandlerAdapter adapter = new DPMouseEventHandlerAdapter(e, "release");
-        addMouseListener((MouseListener) adapter);
+        addMouseListener(adapter);
     }
 
     /**
@@ -2467,14 +2466,14 @@ public final class DrawingPanel implements ImageObserver {
      * lambda functions to handle mouse events that occur in a DrawingPanel.
      */
     @FunctionalInterface
-    public static interface DPMouseEventHandler {
+    public interface DPMouseEventHandler {
         /**
          * Called when a mouse event occurs at the given (x, y) position
          * in the drawing panel window.
          * @param x x-coordinate at which the event occurred
          * @param y y-coordinate at which the event occurred
          */
-        public void onMouseEvent(int x, int y);
+        void onMouseEvent(int x, int y);
     }
 
     /**
@@ -2482,19 +2481,19 @@ public final class DrawingPanel implements ImageObserver {
      * lambda functions to handle key events that occur in a DrawingPanel.
      */
     @FunctionalInterface
-    public static interface DPKeyEventHandler {
+    public interface DPKeyEventHandler {
         /**
          * Called when a key event occurs involving the given key character
          * in the drawing panel window.
          * @param keyCode char value that was typed
          */
-        public void onKeyEvent(char keyCode);
+        void onKeyEvent(char keyCode);
     }
 
     // internal class to implement DPKeyEventHandler behavior.
     private class DPKeyEventHandlerAdapter implements KeyListener {
-        private DPKeyEventHandler handler;
-        private String eventType;
+        private final DPKeyEventHandler handler;
+        private final String eventType;
 
         /**
          * Constructs a new key handler adapter.
@@ -2544,8 +2543,8 @@ public final class DrawingPanel implements ImageObserver {
 
     // internal class to implement DPMouseEventHandler behavior.
     private class DPMouseEventHandlerAdapter implements MouseInputListener {
-        private DPMouseEventHandler handler;
-        private String eventType;
+        private final DPMouseEventHandler handler;
+        private final String eventType;
 
         /**
          * Constructs a new mouse handler adapter.
@@ -2758,15 +2757,15 @@ public final class DrawingPanel implements ImageObserver {
             g2.fillArc(x, y, width, height, startAngle, arcAngle);
         }
 
-        public void drawPolyline(int xPoints[], int yPoints[], int nPoints) {
+        public void drawPolyline(int[] xPoints, int[] yPoints, int nPoints) {
             g2.drawPolyline(xPoints, yPoints, nPoints);
         }
 
-        public void drawPolygon(int xPoints[], int yPoints[], int nPoints) {
+        public void drawPolygon(int[] xPoints, int[] yPoints, int nPoints) {
             g2.drawPolygon(xPoints, yPoints, nPoints);
         }
 
-        public void fillPolygon(int xPoints[], int yPoints[], int nPoints) {
+        public void fillPolygon(int[] xPoints, int[] yPoints, int nPoints) {
             g2.fillPolygon(xPoints, yPoints, nPoints);
         }
 
@@ -2777,17 +2776,17 @@ public final class DrawingPanel implements ImageObserver {
 
         public boolean drawImage(Image img, int x, int y, ImageObserver observer) {
             return g2.drawImage(img, x, y, observer);
-        };
+        }
 
         public boolean drawImage(Image img, int x, int y, int width,
                                  int height, ImageObserver observer) {
             return g2.drawImage(img, x, y, width, height, observer);
-        };
+        }
 
         public boolean drawImage(Image img, int x, int y, Color bgcolor,
                                  ImageObserver observer) {
             return g2.drawImage(img, x, y, bgcolor, observer);
-        };
+        }
 
         public boolean drawImage(Image img, int x, int y, int width,
                                  int height, Color bgcolor, ImageObserver observer) {
@@ -2870,8 +2869,8 @@ public final class DrawingPanel implements ImageObserver {
         private String image1name;
         private int numDiffPixels;
         private int opacity = 50;
-        private String label1Text = "Expected";
-        private String label2Text = "Actual";
+        private final String label1Text = "Expected";
+        private final String label2Text = "Actual";
         private boolean highlightDiffs = false;
 
         private Color highlightColor = new Color(224, 0, 224);
@@ -3314,7 +3313,7 @@ public final class DrawingPanel implements ImageObserver {
      */
     class DirectGif89Frame extends Gif89Frame {
 
-        private int[] argbPixels;
+        private final int[] argbPixels;
 
         // ----------------------------------------------------------------------------
         /**
@@ -3362,7 +3361,7 @@ public final class DrawingPanel implements ImageObserver {
          *            Array containing at least width*height pixels in the
          *            format returned by java.awt.Color.getRGB().
          */
-        public DirectGif89Frame(int width, int height, int argb_pixels[]) {
+        public DirectGif89Frame(int width, int height, int[] argb_pixels) {
             theWidth = width;
             theHeight = height;
             argbPixels = new int[theWidth * theHeight];
@@ -3465,11 +3464,11 @@ public final class DrawingPanel implements ImageObserver {
     class Gif89Encoder {
         private static final boolean DEBUG = false;
         private Dimension dispDim = new Dimension(0, 0);
-        private GifColorTable colorTable;
+        private final GifColorTable colorTable;
         private int bgIndex = 0;
         private int loopCount = 1;
         private String theComments;
-        private Vector<Gif89Frame> vFrames = new Vector<Gif89Frame>();
+        private final Vector<Gif89Frame> vFrames = new Vector<Gif89Frame>();
 
         // ----------------------------------------------------------------------------
         /**
@@ -3533,7 +3532,7 @@ public final class DrawingPanel implements ImageObserver {
          *                See the addFrame() methods.
          */
         public Gif89Encoder(Color[] colors, int width, int height,
-                            byte ci_pixels[]) throws IOException {
+                            byte[] ci_pixels) throws IOException {
             this(colors);
             addFrame(width, height, ci_pixels);
         }
@@ -3617,7 +3616,7 @@ public final class DrawingPanel implements ImageObserver {
          *                add some pedantic check later, to justify the
          *                generality :)
          */
-        public void addFrame(int width, int height, byte ci_pixels[])
+        public void addFrame(int width, int height, byte[] ci_pixels)
                 throws IOException {
             addFrame(new IndexGif89Frame(width, height, ci_pixels));
         }
@@ -3752,7 +3751,7 @@ public final class DrawingPanel implements ImageObserver {
             }
 
             // write GIF TRAILER
-            out.write((int) ';');
+            out.write(';');
 
             out.flush();
         }
@@ -3807,7 +3806,7 @@ public final class DrawingPanel implements ImageObserver {
 
         public void endEncoding(OutputStream out) throws IOException {
             // write GIF TRAILER
-            out.write((int) ';');
+            out.write(';');
 
             out.flush();
         }
@@ -3879,7 +3878,7 @@ public final class DrawingPanel implements ImageObserver {
             // (i.e., interations beyond 1) rather than as an iteration count
             // (thus, to avoid repeating we have to omit the whole extension)
 
-            os.write((int) '!'); // GIF Extension Introducer
+            os.write('!'); // GIF Extension Introducer
             os.write(0xff); // Application Extension Label
 
             os.write(11); // application ID block size
@@ -3896,7 +3895,7 @@ public final class DrawingPanel implements ImageObserver {
 
         // ----------------------------------------------------------------------------
         private void writeCommentExtension(OutputStream os) throws IOException {
-            os.write((int) '!'); // GIF Extension Introducer
+            os.write('!'); // GIF Extension Introducer
             os.write(0xfe); // Comment Extension Label
 
             int remainder = theComments.length() % 255;
@@ -3924,7 +3923,7 @@ public final class DrawingPanel implements ImageObserver {
     class GifColorTable {
 
         // the palette of ARGB colors, packed as returned by Color.getRGB()
-        private int[] theColors = new int[256];
+        private final int[] theColors = new int[256];
 
         // other basic attributes
         private int colorDepth;
@@ -4119,7 +4118,7 @@ public final class DrawingPanel implements ImageObserver {
         private static final int HCAPACITY = 2053; // a nice prime number
 
         // our hash table proper
-        private ColorRecord[] hTable = new ColorRecord[HCAPACITY];
+        private final ColorRecord[] hTable = new ColorRecord[HCAPACITY];
 
         // ----------------------------------------------------------------------------
         // Assert: rgb is not negative (which is the same as saying, be sure the
@@ -4336,7 +4335,7 @@ public final class DrawingPanel implements ImageObserver {
             if (transflag == 1 || epluribus) // using transparency or animating
             // ?
             {
-                os.write((int) '!'); // GIF Extension Introducer
+                os.write('!'); // GIF Extension Introducer
                 os.write(0xf9); // Graphic Control Label
                 os.write(4); // subsequent data block size
                 os.write((disposalCode << 2) | transflag); // packed fields (1
@@ -4349,7 +4348,7 @@ public final class DrawingPanel implements ImageObserver {
 
         // ----------------------------------------------------------------------------
         private void writeImageDescriptor(OutputStream os) throws IOException {
-            os.write((int) ','); // Image Separator
+            os.write(','); // Image Separator
             putShort(thePosition.x, os);
             putShort(thePosition.y, os);
             putShort(theWidth, os);
@@ -4363,10 +4362,11 @@ public final class DrawingPanel implements ImageObserver {
 
         private static final int EOF = -1;
 
-        private int imgW, imgH;
-        private byte[] pixAry;
-        private boolean wantInterlaced;
-        private int initCodeSize;
+        private final int imgW;
+        private final int imgH;
+        private final byte[] pixAry;
+        private final boolean wantInterlaced;
+        private final int initCodeSize;
 
         // raster data navigators
         private int countDown;
@@ -4631,7 +4631,7 @@ public final class DrawingPanel implements ImageObserver {
         int cur_accum = 0;
         int cur_bits = 0;
 
-        int masks[] = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F,
+        int[] masks = { 0x0000, 0x0001, 0x0003, 0x0007, 0x000F, 0x001F, 0x003F,
                 0x007F, 0x00FF, 0x01FF, 0x03FF, 0x07FF, 0x0FFF, 0x1FFF, 0x3FFF,
                 0x7FFF, 0xFFFF };
 
@@ -4764,7 +4764,7 @@ public final class DrawingPanel implements ImageObserver {
          * @param ci_pixels
          *            Array containing at least width*height color-index pixels.
          */
-        public IndexGif89Frame(int width, int height, byte ci_pixels[]) {
+        public IndexGif89Frame(int width, int height, byte[] ci_pixels) {
             theWidth = width;
             theHeight = height;
             ciPixels = new byte[theWidth * theHeight];

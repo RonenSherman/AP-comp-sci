@@ -60,7 +60,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor,   esc key 
         String input;
         Path filePath;
 
-        private JTextArea field = new JTextArea();
+        private final JTextArea field = new JTextArea();
 
         @Override
 

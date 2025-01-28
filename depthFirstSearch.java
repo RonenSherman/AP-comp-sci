@@ -1,12 +1,11 @@
-public class depthFirstSearch { // maze solving with depth first search AKA inorder traversal
+import javax.swing.tree.TreeNode;
+
+public class depthFirstSearch { // maze solving with depth first search
 
     public int num;
     public depthFirstSearch left;
     public depthFirstSearch right;
 
-    depthFirstSearch(int num) {
-        this.num = num;
-    }
 
     public depthFirstSearch(int num, depthFirstSearch left, depthFirstSearch right) {
         this.num = num;
@@ -14,9 +13,7 @@ public class depthFirstSearch { // maze solving with depth first search AKA inor
         this.right = right;
     }
 
-    public depthFirstSearch() {
 
-    }
 
     public depthFirstSearch(char[] chars, depthFirstSearch left, depthFirstSearch right) {
     }
@@ -31,12 +28,17 @@ public class depthFirstSearch { // maze solving with depth first search AKA inor
     }
 
 
-//    public void  depthFirstSearch(TreeNode root, int num)//
-//    {
-//        if(root != null)
-//            root.left.traverseFrom(root.left);
-//        depthFirstSearch(root.,  num+1);
-//
-//    }
+  public void  depthFirstSearch(TreeNode root, int num,depthFirstSearch left, depthFirstSearch right)
+  {
+      if (root == null)
+          return;
+
+      // Traverse left
+    //  depthFirstSearch(root.left);
+      // Traverse root
+      System.out.print(root.getParent() + "->");
+      // Traverse right
+    //  depthFirstSearch(root.right);
+   }
 
 }
