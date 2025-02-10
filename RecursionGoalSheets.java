@@ -62,7 +62,7 @@ public class RecursionGoalSheets {
     }
 
 
-    public static String WriteSquares(int n)
+    public static String WriteSquares(int n)               //
     {
         if (n == 0) {
             return "";
