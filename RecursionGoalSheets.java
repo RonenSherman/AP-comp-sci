@@ -1,7 +1,12 @@
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Scanner;
+
 public class RecursionGoalSheets {
 
     public static void main(String[] args) {
-        System.out.println(WriteSquares(8));
+        System.out.println(MergeSort(8));
 
     }
 
@@ -62,14 +67,45 @@ public class RecursionGoalSheets {
     }
 
 
-    public static String WriteSquares(int n)               //
-    {
-        if (n == 0) {
-            return "";
-        } else {
-            String output = (WriteSquares(n - 1));
-            return output + "," + (n*n);
+    public static String writeSquares(int n) {
+        if (n < 1) {
+            throw new IllegalArgumentException("Input must be at least 1.");
         }
-    }
-}
+        if (n == 1) {
+            return "1";
+        }
 
+        String result;
+        if (n % 2 == 1) {
+            result = n * n + ", " + writeSquares(n - 1);
+        } else {
+            result = writeSquares(n - 1) + ", " + (n * n);
+        }
+        return result;
+    }
+
+    public static ArrayList<String> MergeSort(int n)
+    {
+        /*Divide the unsorted list into n sub-lists, each containing one element
+        (a list of one element is considered sorted).
+        Repeatedly merge sublists to produce new sorted sublists until
+         there is only one sublist remaining. This will be the sorted list.
+        */
+
+        ArrayList<String> Words = new ArrayList<>();
+        System.out.println("Enter a list of eight words");
+        Scanner stringScanner = new Scanner(System.in);
+        for(int i = 0; i < n; i++ ) {
+            String input = stringScanner.next();
+            Words.add(input);
+        }
+        return MergeSortRecursion(Words);
+    }
+    public static ArrayList<String> MergeSortRecursion(ArrayList<String> Words)
+    {
+        int subListSize = 3;
+       // List<ArrayList<String>> subLists = splitArrayList(Words, subListSize);
+        return null;
+    }
+
+}
