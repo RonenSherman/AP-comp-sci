@@ -1,7 +1,8 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+
+//    Ronen Sherman - Recursion goal sheet problems - project 7 (proj 2 sem 2).
 
 public class RecursionGoalSheets {
 
@@ -52,7 +53,6 @@ public class RecursionGoalSheets {
         } else {
             return 1 / (double) n + sumTo((n - 1));
         }
-
     }
 
     public static int Fibonacci(int n) {
@@ -84,7 +84,7 @@ public class RecursionGoalSheets {
         return result;
     }
 
-    public static ArrayList<String> MergeSort(int n)
+    public static List[] MergeSort(int n)
     {
         /*Divide the unsorted list into n sub-lists, each containing one element
         (a list of one element is considered sorted).
@@ -92,20 +92,31 @@ public class RecursionGoalSheets {
          there is only one sublist remaining. This will be the sorted list.
         */
 
-        ArrayList<String> Words = new ArrayList<>();
+        List<String> Words = new ArrayList<>();
         System.out.println("Enter a list of eight words");
         Scanner stringScanner = new Scanner(System.in);
         for(int i = 0; i < n; i++ ) {
             String input = stringScanner.next();
             Words.add(input);
         }
-        return MergeSortRecursion(Words);
+
+       return MergeSortRecursion(Words);
     }
-    public static ArrayList<String> MergeSortRecursion(ArrayList<String> Words)
+    public static List[] MergeSortRecursion(List<String> Words)
     {
-        int subListSize = 3;
-       // List<ArrayList<String>> subLists = splitArrayList(Words, subListSize);
-        return null;
+        List<String> sub1 = new ArrayList<String>();
+        List<String> sub2 = new ArrayList<String>();
+        for (int i = 0; i < Words.size() / 2; i++)
+            sub1.add(Words.get(i));
+        for (int i = Words.size() / 2; i < Words.size(); i++)
+            sub2.add(Words.get(i));
+
+        if(sub1.size()>1)
+        MergeSortRecursion(sub1);
+            else if (sub2.size() >1) {
+                MergeSortRecursion(sub2);
+            }
+         return new List[] { sub1, sub2 };
     }
 
 }
