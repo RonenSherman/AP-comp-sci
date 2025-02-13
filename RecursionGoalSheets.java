@@ -2,12 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-//    Ronen Sherman - Recursion goal sheet problems - project 7 (proj 2 sem 2).
-
 public class RecursionGoalSheets {
 
     public static void main(String[] args) {
-        System.out.println(MergeSort(8));
+        MergeSortInput(8);
 
     }
 
@@ -47,12 +45,13 @@ public class RecursionGoalSheets {
 
     public static double sumTo(int n) {
         if (n < 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Input must be at least 1.");
         else if (n == 0) {
             return 0.0;
         } else {
             return 1 / (double) n + sumTo((n - 1));
         }
+
     }
 
     public static int Fibonacci(int n) {
@@ -65,7 +64,6 @@ public class RecursionGoalSheets {
         }
         return prev2;
     }
-
 
     public static String writeSquares(int n) {
         if (n < 1) {
@@ -83,40 +81,47 @@ public class RecursionGoalSheets {
         }
         return result;
     }
-
-    public static List[] MergeSort(int n)
-    {
+    public static void MergeSortInput(int n) {
         /*Divide the unsorted list into n sub-lists, each containing one element
         (a list of one element is considered sorted).
         Repeatedly merge sublists to produce new sorted sublists until
          there is only one sublist remaining. This will be the sorted list.
         */
 
-        List<String> Words = new ArrayList<>();
+        List<String> unsortedWords = new ArrayList<>();
         System.out.println("Enter a list of eight words");
         Scanner stringScanner = new Scanner(System.in);
-        for(int i = 0; i < n; i++ ) {
+        for (int i = 0; i < n; i++) {
             String input = stringScanner.next();
-            Words.add(input);
+            unsortedWords.add(input.toLowerCase());
         }
-
-       return MergeSortRecursion(Words);
+        List<String> sorted = mergeSort(unsortedWords);
+        System.out.println(sorted);
     }
-    public static List[] MergeSortRecursion(List<String> Words)
-    {
-        List<String> sub1 = new ArrayList<String>();
-        List<String> sub2 = new ArrayList<String>();
-        for (int i = 0; i < Words.size() / 2; i++)
-            sub1.add(Words.get(i));
-        for (int i = Words.size() / 2; i < Words.size(); i++)
-            sub2.add(Words.get(i));
 
-        if(sub1.size()>1)
-        MergeSortRecursion(sub1);
-            else if (sub2.size() >1) {
-                MergeSortRecursion(sub2);
+    public static List<String> mergeSort(List<String> list) {
+        {
+            if (list.size() <= 1) return list; // Base case
+
+            int mid = list.size() / 2;
+            List<String> left = mergeSort(new ArrayList<>(list.subList(0, mid)));
+            List<String> right = mergeSort(new ArrayList<>(list.subList(mid, list.size())));
+
+            // Merging step
+            List<String> sorted = new ArrayList<>();
+            int i = 0, j = 0;
+            while (i < left.size() && j < right.size()) {
+                if (left.get(i).compareTo(right.get(j)) <= 0) {
+                    sorted.add(left.get(i++));
+                } else {
+                    sorted.add(right.get(j++));
+                }
             }
-         return new List[] { sub1, sub2 };
-    }
+            while (i < left.size()) sorted.add(left.get(i++));
+            while (j < right.size()) sorted.add(right.get(j++));
 
+            return sorted;
+
+        }
+    }
 }
