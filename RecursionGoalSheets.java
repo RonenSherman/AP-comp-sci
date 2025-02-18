@@ -1,13 +1,15 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-
-//    Ronen Sherman - Recursion goal sheet problems - project 7 (proj 2 sem 2).
 
 public class RecursionGoalSheets {
 
     public static void main(String[] args) {
-        System.out.println(MergeSort(8));
+        readDictionaryAndInput();
 
     }
 
@@ -47,12 +49,13 @@ public class RecursionGoalSheets {
 
     public static double sumTo(int n) {
         if (n < 0)
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Input must be at least 1.");
         else if (n == 0) {
             return 0.0;
         } else {
             return 1 / (double) n + sumTo((n - 1));
         }
+
     }
 
     public static int Fibonacci(int n) {
@@ -65,7 +68,6 @@ public class RecursionGoalSheets {
         }
         return prev2;
     }
-
 
     public static String writeSquares(int n) {
         if (n < 1) {
@@ -84,39 +86,95 @@ public class RecursionGoalSheets {
         return result;
     }
 
-    public static List[] MergeSort(int n)
-    {
+    public static void MergeSortInput(int n) {
         /*Divide the unsorted list into n sub-lists, each containing one element
         (a list of one element is considered sorted).
         Repeatedly merge sublists to produce new sorted sublists until
          there is only one sublist remaining. This will be the sorted list.
         */
 
-        List<String> Words = new ArrayList<>();
+        List<String> unsortedWords = new ArrayList<>();
         System.out.println("Enter a list of eight words");
         Scanner stringScanner = new Scanner(System.in);
-        for(int i = 0; i < n; i++ ) {
+        for (int i = 0; i < n; i++) {
             String input = stringScanner.next();
-            Words.add(input);
+            unsortedWords.add(input.toLowerCase());
+        }
+        List<String> sorted = mergeSort(unsortedWords);
+        System.out.println(sorted);
+    }
+
+    public static List<String> mergeSort(List<String> list) {
+        {
+            if (list.size() <= 1) return list; // Base case
+
+            int mid = list.size() / 2;
+            List<String> left = mergeSort(new ArrayList<>(list.subList(0, mid)));
+            List<String> right = mergeSort(new ArrayList<>(list.subList(mid, list.size())));
+
+            // Merging step
+            List<String> sorted = new ArrayList<>();
+            int i = 0, j = 0;
+            while (i < left.size() && j < right.size()) {
+                if (left.get(i).compareTo(right.get(j)) <= 0) {
+                    sorted.add(left.get(i++));
+                } else {//hk
+                    sorted.add(right.get(j++));
+                }
+            }
+            while (i < left.size()) sorted.add(left.get(i++));
+            while (j < right.size()) sorted.add(right.get(j++));
+
+            return sorted;
+
+        }
+    }
+
+    private static void readDictionaryAndInput() {
+        List<String> dictionary = readDictionary();
+
+
+
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the first word: ");
+        String word1 = scanner.nextLine().trim().toLowerCase();
+        System.out.print("Enter the second word: ");
+        String word2 = scanner.nextLine().trim().toLowerCase();
+        scanner.close();
+
+
+        // Find indices using binary search
+        int index1 = binarySearch(dictionary, word1, 0, dictionary.size() - 1);
+        int index2 = binarySearch(dictionary, word2, 0, dictionary.size() - 1);
+
+        int countBetween = index2 - index1 - 1;
+        System.out.println("Number of words between '" + word1 + "' and '" + word2 + "': " + countBetween);
+    }
+
+    private static List<String> readDictionary() {
+        List<String> words = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader("dictionary.txt"))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                words.add(line.trim().toLowerCase());
+            }
+            Collections.sort(words); // Ensure dictionary is sorted
+        } catch (IOException e) {
+            System.out.println("Error reading dictionary file.");
+        }
+        return words;
+    }
+
+    private static int binarySearch(List<String> words, String target, int left, int right) {
+        if (left > right) {
+            return left; // If not found, return the insertion point
         }
 
-       return MergeSortRecursion(Words);
-    }
-    public static List[] MergeSortRecursion(List<String> Words)
-    {
-        List<String> sub1 = new ArrayList<String>();
-        List<String> sub2 = new ArrayList<String>();
-        for (int i = 0; i < Words.size() / 2; i++)
-            sub1.add(Words.get(i));
-        for (int i = Words.size() / 2; i < Words.size(); i++)
-            sub2.add(Words.get(i));
+        int mid = left + (right - left) / 2;
+        int cmp = words.get(mid).compareTo(target);
 
-        if(sub1.size()>1)
-        MergeSortRecursion(sub1);
-            else if (sub2.size() >1) {
-                MergeSortRecursion(sub2);
-            }
-         return new List[] { sub1, sub2 };
+        if (cmp == 0) return mid; // Word found
+        if (cmp < 0) return binarySearch(words, target, mid + 1, right); // Search right
+        return binarySearch(words, target, left, mid - 1); // Search left
     }
-
 }
