@@ -25,7 +25,7 @@ public class TextEditorGUI { //       Ronen Sherman File text editor,   esc key 
 
 
         JButton button1 = new JButton();
-        button1.setText("Create new File");
+        button1.setText("Creates new File");
         button1.setPreferredSize(new Dimension(300, 100));
         button1.addActionListener(new FileCreatePressed());
         frame.add(button1);
