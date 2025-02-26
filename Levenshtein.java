@@ -42,7 +42,7 @@ public class Levenshtein {
     /**
      * uses BFS to find the shortest path from start to target.
      * BFS (breadth first search) is different from DFS (which I used in a previous program).
-     * BFS works by first spreading out, exploring all the sides first (hence the "Breadth" in the name) And then moving forwards.
+     * This works by first spreading out, exploring all the sides first (hence the "Breadth" in the name) And then moving forwards level by level.
      * BFS is widely accepted as one of the best "shortest path" algorithms (A* and Dijkstra's are improvements on BFS)
      */
     private static ArrayList<String> transformWord(String start, String target) {
