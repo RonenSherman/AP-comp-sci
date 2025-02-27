@@ -2,14 +2,18 @@ import java.io.*;
 import java.util.*;
 
 public class Levenshtein {
-    // Ronen Sherman Levenshtein using Wagner-Fischer and BFS.
+    // Ronen Sherman
+    // Implements Levenshtein distance using Wagner-Fischer and BFS
+    // This approach finds the shortest transformation sequence between two words
+    // Dictionary words are preloaded from a file for quick access
+
     private static final Set<String> dictionary = new HashSet<>();
-    // Set to store dictionary words for quick lookup
+    // HashSet for fast lookups of dictionary words
 
     public static void main(String[] args) {
-        try (Scanner scanner = new Scanner(System.in)) { // Using try-with-resources for safe handling
+        try (Scanner scanner = new Scanner(System.in)) { // Using try-with-resources to ensure scanner is closed automatically
             System.out.print("Enter the first word: ");
-            String startWord = scanner.nextLine().toLowerCase(); // Convert input to lowercase for consistency
+            String startWord = scanner.nextLine().toLowerCase(); // Convert input to lowercase to ensure case insensitivity
 
             System.out.print("Enter the second word: ");
             String targetWord = scanner.nextLine().toLowerCase();
@@ -17,17 +21,17 @@ public class Levenshtein {
             // Load dictionary from file
             try (Scanner fileScanner = new Scanner(new File("C:\\Users\\shermanr\\IdeaProjects\\Random java work\\dictionarySorted (1).txt"))) {
                 while (fileScanner.hasNextLine()) {
-                    dictionary.add(fileScanner.nextLine().trim().toLowerCase()); // Trim and store words in lowercase
+                    dictionary.add(fileScanner.nextLine().trim().toLowerCase()); // Trim to remove extra spaces, store in lowercase
                 }
             } catch (FileNotFoundException e) {
-                System.out.println("Dictionary file not found."); // Handle missing file scenario
-                return;
+                System.out.println("Dictionary file not found. Please check the file path.");
+                return; // Exit program if dictionary file is missing
             }
 
-            // Find the transformation path from startWord to targetWord
+            // Attempt to transform the startWord to targetWord
             ArrayList<String> path = transformWord(startWord, targetWord);
 
-            // Print the transformation path if found, otherwise indicate failure
+            // Print the transformation path if found
             if (path != null) {
                 System.out.println("Transformation Path:");
                 for (String word : path) {
@@ -40,93 +44,100 @@ public class Levenshtein {
     }
 
     /**
-     * uses BFS to find the shortest path from start to target.
-     * BFS (breadth first search) is different from DFS (which I used in a previous program).
-     * This works by first spreading out, exploring all the sides first (hence the "Breadth" in the name) And then moving forwards level by level.
-     * BFS is widely accepted as one of the best "shortest path" algorithms (A* and Dijkstra's are improvements on BFS)
+     * Uses BFS to find the shortest transformation path from start word to target word.
+     * BFS ensures that the shortest sequence of valid transformations is found first.
      */
     private static ArrayList<String> transformWord(String start, String target) {
-        // Check if both words exist in the dictionary
+        // Ensure both words exist in the dictionary before proceeding
         if (!dictionary.contains(start) || !dictionary.contains(target)) {
             System.out.println("Start or target word not found in dictionary.");
             return null;
         }
 
-        Queue<ArrayList<String>> queue = new ArrayDeque<>(); // BFS queue to track transformation paths
-        queue.add(new ArrayList<>(Collections.singletonList(start))); // Initialize with start word
-        Set<String> visited = new HashSet<>(); // Set to keep track of visited words
-        visited.add(start);
+        Queue<ArrayList<String>> queue = new ArrayDeque<>(); // BFS queue storing paths as lists of words
+        queue.add(new ArrayList<>(Collections.singletonList(start))); // Initialize queue with start word
+        Set<String> visited = new HashSet<>(); // Set to keep track of words that have already been processed
+        visited.add(start); // Mark the start word as visited
 
+        /**
+         * BFS PROCESS:
+         * --------------
+         * - We use a queue to explore words level by level (i.e., all words reachable in 1 step, then 2 steps, etc.).
+         * - Each element in the queue is a path (list of words) representing a possible transformation sequence.
+         * - We always explore the shortest transformation sequences first.
+         * - When we reach the target word, we immediately return that sequence.
+         */
         while (!queue.isEmpty()) {
-            ArrayList<String> path = queue.poll(); // Retrieve and remove the front path in queue
-            String current = path.getLast(); // Get the last word in the current transformation path
+            ArrayList<String> path = queue.poll(); // Retrieve and remove the front path from the queue
+            String current = path.getLast(); // Get the last word in the current transformation sequence
 
-            // If we reach the target word, return the transformation path
+            // If we have reached the target word, return the transformation path
             if (current.equals(target)) {
-                return path;
+                return path; // Shortest path found (thanks to BFS)
             }
 
-            // Explore all valid transformations
+            // Generate all valid next transformations (neighbors)
             for (String neighbor : getValidTransformations(current)) {
-                if (!visited.contains(neighbor)) {
-                    ArrayList<String> newPath = new ArrayList<>(path); // Copy current path
-                    newPath.add(neighbor); // Add new word to the path
-                    queue.add(newPath); // Enqueue the new path for further exploration
-                    visited.add(neighbor); // Mark word as visited
+                if (!visited.contains(neighbor)) { // Ensure we don't process the same word multiple times
+                    ArrayList<String> newPath = new ArrayList<>(path); // Clone the current path
+                    newPath.add(neighbor); // Append the new transformation
+                    queue.add(newPath); // Add new path to the queue (to be explored in the next levels)
+                    visited.add(neighbor); // Mark this word as visited
                 }
             }
         }
-        return null; // No valid transformation path found
+        return null; // If no transformation sequence is found, return null
     }
 
     /**
-     * Generates all valid transformations of a given word by performing:
-     * - Single character substitutions
-     * - Single character insertions
-     * - Single character deletions
+     * Generates all valid words that can be reached from the given word by:
+     * - Replacing a single character
+     * - Inserting a single character
+     * - Deleting a single character
+     * Only words present in the dictionary are considered valid transformations.
      */
     private static ArrayList<String> getValidTransformations(String word) {
         ArrayList<String> transformations = new ArrayList<>();
-        char[] chars = word.toCharArray();
+        char[] chars = word.toCharArray(); // Convert word into a character array for manipulation
 
-        // Substitutions: Replace each character with 'a' to 'z' and check validity
+        // Character substitution: Try replacing each character with every letter from 'a' to 'z'
         for (int i = 0; i < chars.length; i++) {
-            char originalChar = chars[i];
+            char originalChar = chars[i]; // Store original character
             for (char c = 'a'; c <= 'z'; c++) {
-                if (c != originalChar) { // Avoid replacing a character with itself
+                if (c != originalChar) { // Ensure we are making a change
                     chars[i] = c;
-                    String newWord = new String(chars);
-                    if (dictionary.contains(newWord)) { // Check if it's a valid word
+                    String newWord = new String(chars); // Create new transformed word
+                    if (dictionary.contains(newWord)) { // Check if it's a valid dictionary word
                         transformations.add(newWord);
                     }
                 }
             }
-            chars[i] = originalChar; // Restore original character before next iteration
+            chars[i] = originalChar; // Restore original character before moving to the next position
         }
 
-        // Insertions: Insert 'a' to 'z' at every possible position in the word
+        // Character insertion: Insert every letter from 'a' to 'z' at every possible position
         for (int i = 0; i <= chars.length; i++) {
             for (char c = 'a'; c <= 'z'; c++) {
-                String newWord = word.substring(0, i) + c + word.substring(i);
-                if (dictionary.contains(newWord)) { // Check if it's a valid word
+                String newWord = word.substring(0, i) + c + word.substring(i); // Insert character at position i
+                if (dictionary.contains(newWord)) { // Check if it's a valid dictionary word
                     transformations.add(newWord);
                 }
             }
         }
 
-        // Deletions: Remove one character at a time
+        // Character deletion: Remove each character one at a time
         for (int i = 0; i < chars.length; i++) {
-            String newWord = word.substring(0, i) + word.substring(i + 1);
-            if (dictionary.contains(newWord)) { // Check if it's a valid word
+            String newWord = word.substring(0, i) + word.substring(i + 1); // Remove character at index i
+            if (dictionary.contains(newWord)) { // Check if it's a valid dictionary word
                 transformations.add(newWord);
             }
         }
 
-        // message if there are no transformations found
+        // If no transformations are found, output a message for debugging purposes
         if (transformations.isEmpty()) {
             System.out.println("No valid transformations found for word: " + word);
         }
 
-        return transformations; // Return all valid transformed words
+        return transformations; // Return list of valid words generated
     }
 }
