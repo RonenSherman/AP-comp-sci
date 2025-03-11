@@ -1,0 +1,93 @@
+// Define the ChessPiece interface
+interface ChessPiece {
+    String getName();
+    String getColor();
+    boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
+}
+
+// Rook
+class Rook implements ChessPiece {
+    private String color;
+
+    public Rook(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Rook";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        return startRow == endRow || startCol == endCol;
+    }
+}
+
+// King
+class King implements ChessPiece {
+    private String color;
+
+    public King(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "King";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        boolean b = endRow - 1 == startRow || endRow + 1 == startRow || endRow == startRow;
+        return (endCol - 1 == startCol && b) || (endCol + 1 == startCol && b) || endCol == startCol && b;
+    }
+}
+
+// Queen
+class Queen implements ChessPiece {
+    private String color;
+
+    public Queen(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Queen";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+    if(startRow == endRow || startCol == endCol)
+    {
+        return true;
+    }
+    return false;
+    }
+}
+
+ class Main {
+    public static void main(String[] args) {
+        ChessPiece queen = new Queen("White");
+        System.out.println("Piece: " + queen.getName());
+        System.out.println("Color: " + queen.getColor());
+        System.out.println("Is valid move (0, 0) to (0, 1)? " + queen.isValidMove(0, 0, 0, 0));
+        System.out.println("Is valid move (1, 0) to (3, 2)? " + queen.isValidMove(1, 0, 3, 2));
+    }
+}
