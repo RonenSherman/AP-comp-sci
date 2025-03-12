@@ -1,0 +1,169 @@
+import java.util.Objects;
+
+// Define the ChessPiece interface
+interface ChessPiece {
+    String getName();
+    String getColor();
+    boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
+}
+
+// Rook
+class Rook implements ChessPiece {
+    private String color;
+
+    public Rook(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Rook";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        return startRow == endRow || startCol == endCol;
+    }
+}
+
+// King
+class King implements ChessPiece {
+    private String color;
+
+    public King(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "King";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        boolean b = endRow - 1 == startRow || endRow + 1 == startRow || endRow == startRow;
+        return (endCol - 1 == startCol && b) || (endCol + 1 == startCol && b) || endCol == startCol && b;
+    }
+}
+
+// Queen
+class Queen implements ChessPiece {
+    private String color;
+
+    public Queen(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Queen";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        return (startCol == endCol) || (startRow == endRow) || (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+    }
+}
+
+//Bishop
+class Bishop implements ChessPiece {
+    private String color;
+
+    public Bishop(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Bishop";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+      return (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+    }
+}
+
+//Pawn
+class Pawn implements ChessPiece {
+    private String color;
+
+    public Pawn(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Pawn";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+   public boolean isOccupied(int x, int y) {
+        return Chess.Board.board[x][y] != 1;
+    }
+
+
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        int direction = 0;
+
+        if(Objects.equals(color, "White")) {
+             direction = 1; // Assuming white moves up (increase in y). Use -1 for black.
+        } else
+        {
+            direction = -1;
+        }
+
+            // Normal forward move
+        boolean forwardMove = (startCol == endCol) && (endRow == startRow + direction) && !isOccupied;
+
+            // First move, allowing two squares forward
+            boolean firstMove = isFirstMove && (startCol == endCol) && (endRow == startRow + 2 * direction) && !isOccupied;
+
+            // Capturing move (diagonal)
+            boolean captureMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isOccupied;
+
+            // En passant move (diagonal, but the piece being captured is beside the pawn)
+            boolean enPassantMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isEnPassant;
+
+            return forwardMove || firstMove || captureMove || enPassantMove;
+        }
+
+    }
+
+
+
+ class Main {
+    public static void main(String[] args) {
+        ChessPiece queen = new Bishop("White");
+        System.out.println("Piece: " + queen.getName());
+        System.out.println("Color: " + queen.getColor());
+        System.out.println("Is valid move (0, 0) to (0, 1)? " + queen.isValidMove(0, 0, 5, 5));
+        System.out.println("Is valid move (1, 0) to (3, 2)? " + queen.isValidMove(1, 0, 3, 2));
+    }
+}
