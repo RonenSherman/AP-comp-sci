@@ -8,7 +8,7 @@ import java.awt.event.MouseListener;
 public class Chess { // Ronen Sherman - chess and chess bot
 
     public void main() {
-
+//
         Board.panel.setVisible(true);
         Board.panel.addKeyListener(new TakeInputs());
         Board.panel.addMouseListener(new TakeInputs());

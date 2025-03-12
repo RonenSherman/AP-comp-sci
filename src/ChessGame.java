@@ -7,7 +7,7 @@ interface ChessPiece {
     boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
 }
 
-// Rook
+// Rook..
 class Rook implements ChessPiece {
     private String color;
 
