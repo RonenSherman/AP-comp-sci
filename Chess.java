@@ -18,7 +18,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
     }
 
 
-    public static class Board {
+    public static class Board { // Need to make code of ints for pieces
 
 
         public static int[][] board = new int[8][8];
@@ -32,6 +32,9 @@ public class Chess { // Ronen Sherman - chess and chess bot
                 }
             }
 
+        }
+        boolean isOccupied(int x, int y) {
+            return board[x][y] != 1; // If the square is not null, it's occupied
         }
 
         public static void PrintBoard( int size)
@@ -76,12 +79,6 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
         @Override
         public void mouseClicked(MouseEvent e) { // this function is a work in progress. will most likely not work, unfortunately.
-            int x = e.getX() / 10;
-            int y = e.getY() / 10;
-            if (board[x][y] == 0) board[x][y] = 1;
-            else board[x][y] = 0;
-            //     PrintVis(Grid, 10, g);
-
         }
 
         @Override
