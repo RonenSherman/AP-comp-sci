@@ -1,3 +1,5 @@
+import java.util.Objects;
+
 // Define the ChessPiece interface
 interface ChessPiece {
     String getName();
@@ -5,7 +7,7 @@ interface ChessPiece {
     boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
 }
 
-// Rook
+// Rook..//
 class Rook implements ChessPiece {
     private String color;
 
@@ -120,15 +122,25 @@ class Pawn implements ChessPiece {
         return color;
     }
 
+   public boolean isOccupied(int x, int y) {
+        return Chess.Board.board[x][y] != 1;
+    }
 
 
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-            int direction = 1; // Assuming white moves up (increase in y). Use -1 for black.
+        int direction = 0;
+
+        if(Objects.equals(color, "White")) {
+             direction = 1; // Assuming white moves up (increase in y). Use -1 for black.
+        } else
+        {
+            direction = -1;
+        }
 
             // Normal forward move
-            boolean forwardMove = (startCol == endCol) && (endRow == startRow + direction) && !isOccupied;
+        boolean forwardMove = (startCol == endCol) && (endRow == startRow + direction) && !isOccupied;
 
             // First move, allowing two squares forward
             boolean firstMove = isFirstMove && (startCol == endCol) && (endRow == startRow + 2 * direction) && !isOccupied;
