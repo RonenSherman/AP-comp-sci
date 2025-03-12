@@ -74,20 +74,84 @@ class Queen implements ChessPiece {
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-    if(startRow == endRow || startCol == endCol)
-    {
-        return true;
-    }
-    return false;
+        return (startCol == endCol) || (startRow == endRow) || (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
     }
 }
 
+//Bishop
+class Bishop implements ChessPiece {
+    private String color;
+
+    public Bishop(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Bishop";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+      return (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+    }
+}
+
+//Pawn
+class Pawn implements ChessPiece {
+    private String color;
+
+    public Pawn(String color) {
+        this.color = color;
+    }
+
+    @Override
+    public String getName() {
+        return "Pawn";
+    }
+
+    @Override
+    public String getColor() {
+        return color;
+    }
+
+
+
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+            int direction = 1; // Assuming white moves up (increase in y). Use -1 for black.
+
+            // Normal forward move
+            boolean forwardMove = (startCol == endCol) && (endRow == startRow + direction) && !isOccupied;
+
+            // First move, allowing two squares forward
+            boolean firstMove = isFirstMove && (startCol == endCol) && (endRow == startRow + 2 * direction) && !isOccupied;
+
+            // Capturing move (diagonal)
+            boolean captureMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isOccupied;
+
+            // En passant move (diagonal, but the piece being captured is beside the pawn)
+            boolean enPassantMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isEnPassant;
+
+            return forwardMove || firstMove || captureMove || enPassantMove;
+        }
+
+    }
+
+
+
  class Main {
     public static void main(String[] args) {
-        ChessPiece queen = new Queen("White");
+        ChessPiece queen = new Bishop("White");
         System.out.println("Piece: " + queen.getName());
         System.out.println("Color: " + queen.getColor());
-        System.out.println("Is valid move (0, 0) to (0, 1)? " + queen.isValidMove(0, 0, 0, 0));
+        System.out.println("Is valid move (0, 0) to (0, 1)? " + queen.isValidMove(0, 0, 5, 5));
         System.out.println("Is valid move (1, 0) to (3, 2)? " + queen.isValidMove(1, 0, 3, 2));
     }
 }
