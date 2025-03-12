@@ -8,40 +8,37 @@ import java.awt.event.MouseListener;
 public class Chess { // Ronen Sherman - chess and chess bot
 
     public void main() {
-
+//
         Board.panel.setVisible(true);
         Board.panel.addKeyListener(new TakeInputs());
         Board.panel.addMouseListener(new TakeInputs());
 
 
-        Board.PrintBoard(75);
-    }
+        Board.PrintBoardDraw(75);
+    }//
 
 
-    public static class Board { // Need to make code of ints for pieces
+    public static class BackgroundBoard { // background board for color
 
 
-        public static int[][] board = new int[8][8];
+        public static int[][] BackgroundBoard = new int[8][8];
         public static DrawingPanel panel = new DrawingPanel(600, 650);
         public static Graphics g = panel.getGraphics();
 
-        public Board() {
+        public BackgroundBoard() {
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
-                    board[row][col] = (row + col) % 2;  // Alternates between 0 and 1
+                    BackgroundBoard[row][col] = (row + col) % 2;  // Alternates between 0 and 1
                 }
             }
 
         }
-        boolean isOccupied(int x, int y) {
-            return board[x][y] != 1; // If the square is not null, it's occupied
-        }
 
-        public static void PrintBoard( int size)
+        public static void PrintBoardDraw( int size)
         {
-            for (int i = 0; i < board.length; i++) {// iterates over the board and prints it
-                for (int j = 0; j < board.length; j++) {
-                    if (board[i][j] == 0) {
+            for (int i = 0; i < BackgroundBoard.length; i++) {// iterates over the board and prints it
+                for (int j = 0; j < BackgroundBoard.length; j++) {
+                    if (BackgroundBoard[i][j] == 0) {
                         g.setColor(Color.WHITE);//
                         g.fillRect(i * size, j * size, size, size);
                     } else {
