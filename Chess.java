@@ -9,18 +9,17 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
     public void main() {
 
+    BackgroundBoard backgroundBoard = new BackgroundBoard();
 
         BackgroundBoard.panel.setVisible(true);
-        BackgroundBoard.panel.addKeyListener(new TakeInputs());
         BackgroundBoard.panel.addMouseListener(new TakeInputs());
 
 
-        BackgroundBoard.PrintBoardDraw(75);
+        BackgroundBoard.BackGroundDraw(75);
     }//
 
 
     public static class BackgroundBoard { // background board for color
-
 
         public static int[][] BackgroundBoard = new int[8][8];
         public static DrawingPanel panel = new DrawingPanel(600, 650);
@@ -32,10 +31,9 @@ public class Chess { // Ronen Sherman - chess and chess bot
                     BackgroundBoard[row][col] = (row + col) % 2;  // Alternates between 0 and 1
                 }
             }
-
         }
 
-        public static void PrintBoardDraw( int size)
+        public static void BackGroundDraw( int size)
         {
             for (int i = 0; i < BackgroundBoard.length; i++) {// iterates over the board and prints it
                 for (int j = 0; j < BackgroundBoard.length; j++) {
@@ -50,7 +48,6 @@ public class Chess { // Ronen Sherman - chess and chess bot
             }
         }
     }
-
 
     public static class GameBoard
     {
@@ -83,30 +80,9 @@ public class Chess { // Ronen Sherman - chess and chess bot
     }
 
 
-    class TakeInputs extends Chess.GameBoard implements MouseListener, KeyListener {
-        @Override
-        public void keyTyped(KeyEvent e) {
+    class TakeInputs extends Chess.GameBoard implements MouseListener {
 
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_SPACE) { // if the key pressed is space, it flips DoGame, and prints some numbers.
-            }
-
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) { // if the key pressed is space, it flips DoGame, and prints some numbers.
-                System.exit(0);
-
-            }
-
-        }
-
-        @Override
+                @Override
         public void mouseClicked(MouseEvent e) { // this function is a work in progress. will most likely not work, unfortunately.
         }
 
