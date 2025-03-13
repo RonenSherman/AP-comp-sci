@@ -1,28 +1,35 @@
-import java.util.Objects;
-
 // Define the ChessPiece interface
 interface ChessPiece {
     String getName();
-    String getColor();
+
+    String color();
+
     boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
 }
 
-// Rook..//
-class Rook implements ChessPiece {
-    private String color;
 
-    public Rook(String color) {
-        this.color = color;
+//Knight
+record Knight(String color) implements ChessPiece {
+
+    @Override
+    public String getName() {
+        return "Knight";
     }
+
+    @Override
+    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        int rowDiff = Math.abs(startRow - endRow);
+        int colDiff = Math.abs(startCol - endCol);
+        return (rowDiff == 2 && colDiff == 1) || (rowDiff == 1 && colDiff == 2);
+    }
+}
+
+// Rook
+record Rook(String color) implements ChessPiece {
 
     @Override
     public String getName() {
         return "Rook";
-    }
-
-    @Override
-    public String getColor() {
-        return color;
     }
 
     @Override
@@ -32,12 +39,7 @@ class Rook implements ChessPiece {
 }
 
 // King
-class King implements ChessPiece {
-    private String color;
-
-    public King(String color) {
-        this.color = color;
-    }
+record King(String color) implements ChessPiece {
 
     @Override
     public String getName() {
@@ -45,24 +47,13 @@ class King implements ChessPiece {
     }
 
     @Override
-    public String getColor() {
-        return color;
-    }
-
-    @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        boolean b = endRow - 1 == startRow || endRow + 1 == startRow || endRow == startRow;
-        return (endCol - 1 == startCol && b) || (endCol + 1 == startCol && b) || endCol == startCol && b;
+        return Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1;
     }
 }
 
 // Queen
-class Queen implements ChessPiece {
-    private String color;
-
-    public Queen(String color) {
-        this.color = color;
-    }
+record Queen(String color) implements ChessPiece {
 
     @Override
     public String getName() {
@@ -70,23 +61,14 @@ class Queen implements ChessPiece {
     }
 
     @Override
-    public String getColor() {
-        return color;
-    }
-
-    @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return (startCol == endCol) || (startRow == endRow) || (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+        return startRow == endRow || startCol == endCol ||
+                Math.abs(startRow - endRow) == Math.abs(startCol - endCol);
     }
 }
 
 //Bishop
-class Bishop implements ChessPiece {
-    private String color;
-
-    public Bishop(String color) {
-        this.color = color;
-    }
+record Bishop(String color) implements ChessPiece {
 
     @Override
     public String getName() {
@@ -94,19 +76,15 @@ class Bishop implements ChessPiece {
     }
 
     @Override
-    public String getColor() {
-        return color;
-    }
-
-    @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-      return (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+        return (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
     }
 }
 
 //Pawn
 class Pawn implements ChessPiece {
-    private String color;
+    private final String color;
+    private boolean isFirstMove = true; // Track if the pawn has moved before
 
     public Pawn(String color) {
         this.color = color;
@@ -118,52 +96,50 @@ class Pawn implements ChessPiece {
     }
 
     @Override
-    public String getColor() {
+    public String color() {
         return color;
     }
 
-   public boolean isOccupied(int x, int y) {
-        return Chess.Board.board[x][y] != 1;
-    }
-
-
-
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        int direction = 0;
+        int direction = color.equals("White") ? -1 : 1; // White moves up (-1), Black moves down (+1)
+        int rowDiff = endRow - startRow;
+        int colDiff = Math.abs(endCol - startCol);
 
-        if(Objects.equals(color, "White")) {
-             direction = 1; // Assuming white moves up (increase in y). Use -1 for black.
-        } else
-        {
-            direction = -1;
+        // Standard move: one step forward
+        if (colDiff == 0 && rowDiff == direction) {
+            return true;
         }
 
-            // Normal forward move
-        boolean forwardMove = (startCol == endCol) && (endRow == startRow + direction) && !isOccupied;
-
-            // First move, allowing two squares forward
-            boolean firstMove = isFirstMove && (startCol == endCol) && (endRow == startRow + 2 * direction) && !isOccupied;
-
-            // Capturing move (diagonal)
-            boolean captureMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isOccupied;
-
-            // En passant move (diagonal, but the piece being captured is beside the pawn)
-            boolean enPassantMove = (Math.abs(startCol - endCol) == 1) && (endRow == startRow + direction) && isEnPassant;
-
-            return forwardMove || firstMove || captureMove || enPassantMove;
+        // First move: two steps forward
+        if (isFirstMove && colDiff == 0 && rowDiff == 2 * direction) {
+            return true;
         }
 
+        // Capturing: Move diagonally forward (one step)
+        return colDiff == 1 && rowDiff == direction;
+
+        // En Passant (Handled in game logic outside this method)
     }
 
+    // En Passant validation (must be checked at game level)
+    public boolean canEnPassant(int startRow, int endCol, Pawn lastMovedPawn, int lastMoveRow, int lastMoveCol) {
+        if (lastMovedPawn == null || !lastMovedPawn.color().equals(oppositeColor()) || lastMoveRow != startRow) {
+            return false; // En passant only applies to an adjacent pawn of the opposite color
+        }
 
+        // Check if the last move was a two-step pawn move
+        if (Math.abs(lastMoveRow - startRow) == 2 && lastMoveCol == endCol) {
+            return true;
+        }
+        return false;
+    }
 
- class Main {
-    public static void main(String[] args) {
-        ChessPiece queen = new Bishop("White");
-        System.out.println("Piece: " + queen.getName());
-        System.out.println("Color: " + queen.getColor());
-        System.out.println("Is valid move (0, 0) to (0, 1)? " + queen.isValidMove(0, 0, 5, 5));
-        System.out.println("Is valid move (1, 0) to (3, 2)? " + queen.isValidMove(1, 0, 3, 2));
+    private String oppositeColor() {
+        return color.equals("White") ? "Black" : "White";
+    }
+
+    public void move() {
+        isFirstMove = false; // Once moved, first move rule no longer applies
     }
 }
