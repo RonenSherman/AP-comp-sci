@@ -8,13 +8,14 @@ import java.awt.event.MouseListener;
 public class Chess { // Ronen Sherman - chess and chess bot
 
     public void main() {
-//
-        Board.panel.setVisible(true);
-        Board.panel.addKeyListener(new TakeInputs());
-        Board.panel.addMouseListener(new TakeInputs());
 
 
-        Board.PrintBoardDraw(75);
+        BackgroundBoard.panel.setVisible(true);
+        BackgroundBoard.panel.addKeyListener(new TakeInputs());
+        BackgroundBoard.panel.addMouseListener(new TakeInputs());
+
+
+        BackgroundBoard.PrintBoardDraw(75);
     }//
 
 
@@ -51,7 +52,38 @@ public class Chess { // Ronen Sherman - chess and chess bot
     }
 
 
-    class TakeInputs extends Chess.Board implements MouseListener, KeyListener {
+    public static class GameBoard
+    {
+        public GameBoard()
+        {
+            ChessPiece[][] gameBoard = new ChessPiece[8][8];
+
+            // Place Pawns
+            for (int col = 0; col < 8; col++) {
+                gameBoard[1][col] = new Pawn("White");
+                gameBoard[6][col] = new Pawn("Black");
+            }
+
+            // Place major pieces
+            placeMajorPieces(gameBoard, 0, "White"); // White pieces on row 0
+            placeMajorPieces(gameBoard, 7, "Black"); // Black pieces on row 7
+        }
+
+        private static void placeMajorPieces(ChessPiece[][] board, int row, String color) {
+            board[row][0] = new Rook(color);
+            board[row][7] = new Rook(color);
+            board[row][1] = new Knight(color);
+            board[row][6] = new Knight(color);
+            board[row][2] = new Bishop(color);
+            board[row][5] = new Bishop(color);
+            board[row][3] = new Queen(color);
+            board[row][4] = new King(color);
+        }
+
+    }
+
+
+    class TakeInputs extends Chess.GameBoard implements MouseListener, KeyListener {
         @Override
         public void keyTyped(KeyEvent e) {
 
@@ -99,3 +131,6 @@ public class Chess { // Ronen Sherman - chess and chess bot
         }
     }
 }
+
+
+
