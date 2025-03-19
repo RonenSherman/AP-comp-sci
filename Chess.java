@@ -1,9 +1,6 @@
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLOutput;
 
 
 public class Chess { // Ronen Sherman - chess and chess bot
@@ -61,20 +58,20 @@ public class Chess { // Ronen Sherman - chess and chess bot
             }
 
             // Place major pieces
-            placeMajorPieces(gameBoard, 0, true);  // White pieces on row 0
-            placeMajorPieces(gameBoard, 7, false); // Black pieces on row 7
+            placeMajorPieces(0, true);  // White pieces on row 0
+            placeMajorPieces(7, false); // Black pieces on row 7
             PrintGame();
         }
 
-        private static void placeMajorPieces(ChessPiece[][] board, int row, boolean isWhite) {
-            board[row][0] = new Rook(isWhite);
-            board[row][7] = new Rook(isWhite);
-            board[row][1] = new Knight(isWhite);
-            board[row][6] = new Knight(isWhite);
-            board[row][2] = new Bishop(isWhite);
-            board[row][5] = new Bishop(isWhite);
-            board[row][3] = new Queen(isWhite);
-            board[row][4] = new King(isWhite);
+        private static void placeMajorPieces(int row, boolean isWhite) {
+            GameBoard.gameBoard[row][0] = new Rook(isWhite);
+            GameBoard.gameBoard[row][7] = new Rook(isWhite);
+            GameBoard.gameBoard[row][1] = new Knight(isWhite);
+            GameBoard.gameBoard[row][6] = new Knight(isWhite);
+            GameBoard.gameBoard[row][2] = new Bishop(isWhite);
+            GameBoard.gameBoard[row][5] = new Bishop(isWhite);
+            GameBoard.gameBoard[row][3] = new Queen(isWhite);
+            GameBoard.gameBoard[row][4] = new King(isWhite);
         }
 
         public static void PrintGame() {
@@ -95,7 +92,6 @@ public class Chess { // Ronen Sherman - chess and chess bot
                         } else
                         {
                             switch (gameBoard[i][j].getName()) {
-
                                 case "Pawn" -> pieceSymbol = '♟';
                                 case "Rook" -> pieceSymbol = '♜';
                                 case "Knight" -> pieceSymbol = '♞';
@@ -105,14 +101,13 @@ public class Chess { // Ronen Sherman - chess and chess bot
                                 default -> pieceSymbol = '?'; // Should never happen
                             }
                         }
+                        if(Chess.BackgroundBoard.BackgroundBoard[i][j] == 0)
+                            g.setColor(Color.BLACK);
                         g.setFont(new Font("piece" , Font.PLAIN,  65));
                         g.drawString(String.valueOf(pieceSymbol),j*75,(i+1)*75);
-                        System.out.println(String.valueOf(pieceSymbol));
-                    } else {
-                      //  System.out.print("-- "); // Empty space
+                        g.setColor(Color.WHITE);
                     }
                 }
-                System.out.println();
             }
         }
    }
