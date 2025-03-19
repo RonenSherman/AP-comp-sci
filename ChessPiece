@@ -1,19 +1,26 @@
 // Define the ChessPiece interface
 interface ChessPiece {
     String getName();
-
-    String color();
-
+    boolean iswhite();
     boolean isValidMove(int startRow, int startCol, int endRow, int endCol);
 }
 
+// Knight
+class Knight implements ChessPiece {
+    private final boolean isWhite;
 
-//Knight
-record Knight(String color) implements ChessPiece {
+    public Knight(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
 
     @Override
     public String getName() {
         return "Knight";
+    }
+
+    @Override
+    public boolean iswhite() {
+        return isWhite;
     }
 
     @Override
@@ -25,11 +32,21 @@ record Knight(String color) implements ChessPiece {
 }
 
 // Rook
-record Rook(String color) implements ChessPiece {
+class Rook implements ChessPiece {
+    private final boolean isWhite;
+
+    public Rook(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
 
     @Override
     public String getName() {
         return "Rook";
+    }
+
+    @Override
+    public boolean iswhite() {
+        return isWhite;
     }
 
     @Override
@@ -39,11 +56,21 @@ record Rook(String color) implements ChessPiece {
 }
 
 // King
-record King(String color) implements ChessPiece {
+class King implements ChessPiece {
+    private final boolean isWhite;
+
+    public King(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
 
     @Override
     public String getName() {
         return "King";
+    }
+
+    @Override
+    public boolean iswhite() {
+        return isWhite;
     }
 
     @Override
@@ -53,11 +80,21 @@ record King(String color) implements ChessPiece {
 }
 
 // Queen
-record Queen(String color) implements ChessPiece {
+class Queen implements ChessPiece {
+    private final boolean isWhite;
+
+    public Queen(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
 
     @Override
     public String getName() {
         return "Queen";
+    }
+
+    @Override
+    public boolean iswhite() {
+        return isWhite;
     }
 
     @Override
@@ -67,8 +104,13 @@ record Queen(String color) implements ChessPiece {
     }
 }
 
-//Bishop
-record Bishop(String color) implements ChessPiece {
+// Bishop
+class Bishop implements ChessPiece {
+    private final boolean isWhite;
+
+    public Bishop(boolean isWhite) {
+        this.isWhite = isWhite;
+    }
 
     @Override
     public String getName() {
@@ -76,18 +118,23 @@ record Bishop(String color) implements ChessPiece {
     }
 
     @Override
+    public boolean iswhite() {
+        return isWhite;
+    }
+
+    @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return (Math.abs(startCol - endCol) == Math.abs(startRow - endRow));
+        return Math.abs(startCol - endCol) == Math.abs(startRow - endRow);
     }
 }
 
-//Pawn
+// Pawn
 class Pawn implements ChessPiece {
-    private final String color;
+    private final boolean isWhite;
     private boolean isFirstMove = true; // Track if the pawn has moved before
 
-    public Pawn(String color) {
-        this.color = color;
+    public Pawn(boolean isWhite) {
+        this.isWhite = isWhite;
     }
 
     @Override
@@ -96,13 +143,13 @@ class Pawn implements ChessPiece {
     }
 
     @Override
-    public String color() {
-        return color;
+    public boolean iswhite() {
+        return isWhite;
     }
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        int direction = color.equals("White") ? -1 : 1; // White moves up (-1), Black moves down (+1)
+        int direction = isWhite ? -1 : 1; // White moves up (-1), Black moves down (+1)
         int rowDiff = endRow - startRow;
         int colDiff = Math.abs(endCol - startCol);
 
@@ -118,25 +165,16 @@ class Pawn implements ChessPiece {
 
         // Capturing: Move diagonally forward (one step)
         return colDiff == 1 && rowDiff == direction;
-
-        // En Passant (Handled in game logic outside this method)
     }
 
     // En Passant validation (must be checked at game level)
     public boolean canEnPassant(int startRow, int endCol, Pawn lastMovedPawn, int lastMoveRow, int lastMoveCol) {
-        if (lastMovedPawn == null || !lastMovedPawn.color().equals(oppositeColor()) || lastMoveRow != startRow) {
+        if (lastMovedPawn == null || lastMovedPawn.iswhite() == this.isWhite || lastMoveRow != startRow) {
             return false; // En passant only applies to an adjacent pawn of the opposite color
         }
 
         // Check if the last move was a two-step pawn move
-        if (Math.abs(lastMoveRow - startRow) == 2 && lastMoveCol == endCol) {
-            return true;
-        }
-        return false;
-    }
-
-    private String oppositeColor() {
-        return color.equals("White") ? "Black" : "White";
+        return Math.abs(lastMoveRow - startRow) == 2 && lastMoveCol == endCol;
     }
 
     public void move() {
