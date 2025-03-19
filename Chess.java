@@ -3,27 +3,29 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.SQLOutput;
 
 
 public class Chess { // Ronen Sherman - chess and chess bot
+    public static DrawingPanel panel = new DrawingPanel(600, 650);
+    public static Graphics g = panel.getGraphics();
 
     public void main() {
+        panel.setVisible(true);
+        panel.addMouseListener(new TakeInputs());
 
-        BackgroundBoard backgroundBoard = new BackgroundBoard();
-
-        BackgroundBoard.panel.setVisible(true);
-        BackgroundBoard.panel.addMouseListener(new TakeInputs());
 
 
         BackgroundBoard.BackGroundDraw(75);
+        GameBoard.PrintGame();
     }//
+
+
 
 
     public static class BackgroundBoard { // background board for color
 
         public static int[][] BackgroundBoard = new int[8][8];
-        public static DrawingPanel panel = new DrawingPanel(600, 650);
-        public static Graphics g = panel.getGraphics();
 
         public BackgroundBoard() {
             for (int row = 0; row < 8; row++) {
@@ -48,8 +50,8 @@ public class Chess { // Ronen Sherman - chess and chess bot
         }
     }
 
-    public static class GameBoard {
-        private ChessPiece[][] gameBoard = new ChessPiece[8][8];
+    public static class GameBoard extends Chess.BackgroundBoard {
+        private static final ChessPiece[][] gameBoard = new ChessPiece[8][8];
 
         public GameBoard() {
             // Place Pawns
@@ -75,23 +77,39 @@ public class Chess { // Ronen Sherman - chess and chess bot
             board[row][4] = new King(isWhite);
         }
 
-        public void PrintGame() {
+        public static void PrintGame() {
             for (int i = 0; i < gameBoard.length; i++) {
                 for (int j = 0; j < gameBoard[i].length; j++) {
                     if (gameBoard[i][j] != null) {
                         char pieceSymbol;
-                        switch (gameBoard[i][j].getName()) {
-                            case "Pawn" -> pieceSymbol = 'P';
-                            case "Rook" -> pieceSymbol = 'R';
-                            case "Knight" -> pieceSymbol = 'N';
-                            case "Bishop" -> pieceSymbol = 'B';
-                            case "Queen" -> pieceSymbol = 'Q';
-                            case "King" -> pieceSymbol = 'K';
-                            default -> pieceSymbol = '?'; // Should never happen
+                        if(gameBoard[i][j].iswhite()) {
+                            switch (gameBoard[i][j].getName()) {
+                                case "Pawn" -> pieceSymbol = '♙';
+                                case "Rook" -> pieceSymbol = '♖';
+                                case "Knight" -> pieceSymbol = '♘';
+                                case "Bishop" -> pieceSymbol = '♗';
+                                case "Queen" -> pieceSymbol = '♕';
+                                case "King" -> pieceSymbol = '♔';
+                                default -> pieceSymbol = '?'; // Should never happen
+                            }
+                        } else
+                        {
+                            switch (gameBoard[i][j].getName()) {
+
+                                case "Pawn" -> pieceSymbol = '♟';
+                                case "Rook" -> pieceSymbol = '♜';
+                                case "Knight" -> pieceSymbol = '♞';
+                                case "Bishop" -> pieceSymbol = '♝';
+                                case "Queen" -> pieceSymbol = '♛';
+                                case "King" -> pieceSymbol = '♚';
+                                default -> pieceSymbol = '?'; // Should never happen
+                            }
                         }
-                        System.out.print((gameBoard[i][j].iswhite() ? "W-" : "B-") + pieceSymbol + " ");
+                        g.setFont(new Font("piece" , Font.PLAIN,  65));
+                        g.drawString(String.valueOf(pieceSymbol),j*75,(i+1)*75);
+                        System.out.println(String.valueOf(pieceSymbol));
                     } else {
-                        System.out.print("-- "); // Empty space
+                      //  System.out.print("-- "); // Empty space
                     }
                 }
                 System.out.println();
