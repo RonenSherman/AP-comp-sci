@@ -9,15 +9,11 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
     public void main() {
         panel.setVisible(true);
-        panel.addMouseListener(new TakeInputs());
-
-
+        panel.addMouseListener(new GameBoard());
 
         BackgroundBoard.BackGroundDraw(75);
         GameBoard.PrintGame();
-    }//
-
-
+    }
 
 
     public static class BackgroundBoard { // background board for color
@@ -47,8 +43,11 @@ public class Chess { // Ronen Sherman - chess and chess bot
         }
     }
 
-    public static class GameBoard extends Chess.BackgroundBoard {
+    public static class GameBoard extends Chess.BackgroundBoard implements MouseListener {
         private static final ChessPiece[][] gameBoard = new ChessPiece[8][8];
+        ChessPiece Selected;
+        int pieceX;
+        int pieceY;
 
         public GameBoard() {
             // Place Pawns
@@ -60,7 +59,6 @@ public class Chess { // Ronen Sherman - chess and chess bot
             // Place major pieces
             placeMajorPieces(0, true);  // White pieces on row 0
             placeMajorPieces(7, false); // Black pieces on row 7
-            PrintGame();
         }
 
         private static void placeMajorPieces(int row, boolean isWhite) {
@@ -74,12 +72,26 @@ public class Chess { // Ronen Sherman - chess and chess bot
             GameBoard.gameBoard[row][4] = new King(isWhite);
         }
 
+     /*  public static void Showmoves()
+        {
+            for(int i =0; i <= gameBoard.length; i++) {
+                for (int j = 0; j < gameBoard[i].length; j++) {
+                if( gameBoard[i][j].getName() != null)
+                {
+                   String name =  gameBoard[i][j].getName();
+
+                }
+                }
+            }
+
+        }*/
+
         public static void PrintGame() {
             for (int i = 0; i < gameBoard.length; i++) {
                 for (int j = 0; j < gameBoard[i].length; j++) {
                     if (gameBoard[i][j] != null) {
                         char pieceSymbol;
-                        if(gameBoard[i][j].iswhite()) {
+                        if (gameBoard[i][j].iswhite()) {
                             switch (gameBoard[i][j].getName()) {
                                 case "Pawn" -> pieceSymbol = '♙';
                                 case "Rook" -> pieceSymbol = '♖';
@@ -89,8 +101,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
                                 case "King" -> pieceSymbol = '♔';
                                 default -> pieceSymbol = '?'; // Should never happen
                             }
-                        } else
-                        {
+                        } else {
                             switch (gameBoard[i][j].getName()) {
                                 case "Pawn" -> pieceSymbol = '♟';
                                 case "Rook" -> pieceSymbol = '♜';
@@ -101,43 +112,59 @@ public class Chess { // Ronen Sherman - chess and chess bot
                                 default -> pieceSymbol = '?'; // Should never happen
                             }
                         }
-                        if(Chess.BackgroundBoard.BackgroundBoard[i][j] == 0)
+                        if (Chess.BackgroundBoard.BackgroundBoard[i][j] == 0)
                             g.setColor(Color.BLACK);
-                        g.setFont(new Font("piece" , Font.PLAIN,  65));
-                        g.drawString(String.valueOf(pieceSymbol),j*75,(i+1)*75);
+                        g.setFont(new Font("piece", Font.PLAIN, 65));
+                        g.drawString(String.valueOf(pieceSymbol), j * 75, (i + 1) * 75);
                         g.setColor(Color.WHITE);
                     }
                 }
             }
         }
-   }
 
-
-
-    class TakeInputs extends GameBoard implements MouseListener {
-
-            @Override
-            public void mouseClicked(MouseEvent e) { // this function is a work in progress. will most likely not work, unfortunately.
-            }
-
-            @Override
-            public void mousePressed(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseReleased(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent e) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-
+        @Override
+        public void mousePressed(MouseEvent e) {
+            int x = e.getX()/75;
+            int y = e.getY()/75;
+            if (gameBoard[y][x] != null && Selected == null)
+            {
+                x = pieceX;
+                y = pieceY;
+                Selected = gameBoard[y][x];
+            } else
+            {
+               if( Selected.isValidMove(pieceX,pieceY, x,y))
+               {
+                   gameBoard[y][x] = Selected;
+                   gameBoard[pieceX][pieceY] = null;
+                   Selected = null;
+                   PrintGame();
+               }
             }
         }
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+
+        }
     }
+}
+
+
+
+
