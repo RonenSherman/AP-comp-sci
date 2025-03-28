@@ -4,6 +4,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.Arrays;
+import java.util.Objects;
 
 
 public class Chess { // Ronen Sherman - chess and chess bot
@@ -49,6 +50,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
     public static class GameBoard extends Chess.BackgroundBoard implements MouseListener, KeyListener {
         static final ChessPiece[][] gameBoard = new ChessPiece[8][8];
+        boolean turn = true;
         ChessPiece Selected;
         int pieceX;
         int pieceY;
@@ -105,21 +107,33 @@ public class Chess { // Ronen Sherman - chess and chess bot
         }
 
         private void handleMove(int x, int y) {
-            boolean turn = true;
+
             // Check if there's a piece at the clicked position
-            if(turn) {
-                if (gameBoard[y][x] != null) {
-                    // If the same piece is clicked again, deselect it
-                    if (Selected == gameBoard[y][x]) {
-                        Selected = null;
-                    }
-                    // If no piece is currently selected, select the clicked piece
-                    else if (Selected == null) {
+            if (gameBoard[y][x] != null) {
+                // If the same piece is clicked again, deselect it
+                if (Selected == gameBoard[y][x]) {
+                    Selected = null;
+                }
+
+                // If no piece is currently selected, select the clicked piece
+                if (Selected == null) {
+                    if (turn && gameBoard[y][x].iswhite()) {
+                        // White turn
+
                         Selected = gameBoard[y][x];
                         pieceX = x;
                         pieceY = y;
+                        turn = false;
+
+                    } else if (!turn && !gameBoard[y][x].iswhite()) {
+                        //black turn
+                        Selected = gameBoard[y][x];
+                        pieceX = x;
+                        pieceY = y;
+                        turn = true;
                     }
-                    // If a piece is already selected, check if it's a valid capture
+                    Selected = null; // Reset selection if the move is invalid
+                }    // If a piece is already selected, check if it's a valid capture
                     else if (Selected.isValidMove(pieceX, pieceY, x, y) && gameBoard[y][x].iswhite() != Selected.iswhite()) {
                         // Capture the piece (replace the enemy piece with the selected piece)
                         gameBoard[y][x] = Selected;
@@ -131,25 +145,33 @@ public class Chess { // Ronen Sherman - chess and chess bot
                         Chess.BackgroundBoard.BackGroundDraw(75);
                         PrintGame();
                     }
-                }
                 // If an empty space is clicked and a piece is selected, attempt to move
                 else if (Selected != null) {
-                    if (Selected.isValidMove(pieceX, pieceY, x, y)) {
-                        // Move the selected piece
-                        gameBoard[y][x] = Selected;
-                        gameBoard[pieceY][pieceX] = null;
-                        Selected = null;
+                        if (Selected.isValidMove(pieceX, pieceY, x, y)) {
+                            // Move the selected piece
+                            gameBoard[y][x] = Selected;
+                            gameBoard[pieceY][pieceX] = null;
+                            Selected = null;
 
-                        // Redraw the board after moving
-                        panel.clear(); // Custom method to clear the board
-                        Chess.BackgroundBoard.BackGroundDraw(75);
-                        PrintGame();
-                    } else {
-                        Selected = null; // Reset selection if the move is invalid
-                    }
+                            // Redraw the board after moving
+                            panel.clear(); // Custom method to clear the board
+                            Chess.BackgroundBoard.BackGroundDraw(75);
+                            PrintGame();
+                        } else {
+                            Selected = null; // Reset selection if the move is invalid
+                        }
                 }
-                turn = !turn;
             }
+        }
+
+        private Boolean CanCastle(int x,int y)
+        {
+            if(Objects.equals(Selected.getName(), "King"))
+            {
+                return true;
+            }
+
+                return false;
         }
 
         @Override
@@ -163,15 +185,19 @@ public class Chess { // Ronen Sherman - chess and chess bot
             }
             handleMove(x, y);
         }
+
         @Override
         public void mouseClicked(MouseEvent e) {
         }
+
         @Override
         public void mousePressed(MouseEvent e) {
         }
+
         @Override
         public void mouseEntered(MouseEvent e) {
         }
+
         @Override
         public void mouseExited(MouseEvent e) {
         }
