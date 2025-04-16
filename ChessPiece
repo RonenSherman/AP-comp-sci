@@ -34,6 +34,8 @@ class Knight implements ChessPiece {
 // Rook
 class Rook implements ChessPiece {
     private final boolean isWhite;
+    private boolean isFirstMove = true; // Track if the piece has moved before
+
 
     public Rook(boolean isWhite) {
         this.isWhite = isWhite;
@@ -53,11 +55,18 @@ class Rook implements ChessPiece {
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
         return startRow == endRow || startCol == endCol;
     }
+    public void move() {
+        isFirstMove = false; // Once moved, first move rule no longer applies
+    }
+    public boolean hasMoved() {
+        return !isFirstMove;
+    }
 }
 
 // King
 class King implements ChessPiece {
     private final boolean isWhite;
+    private boolean isFirstMove = true; // Track if the piece has moved before
 
     public King(boolean isWhite) {
         this.isWhite = isWhite;
@@ -75,9 +84,57 @@ class King implements ChessPiece {
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1;
+        // Ensure the King moves within one square in any direction (horizontally, vertically, or diagonally)
+        if (Math.abs(startRow - endRow) > 1 || Math.abs(startCol - endCol) > 1) {
+            return false;
+        }
+
+        // Check if the destination square is occupied by a friendly piece (same color)
+        ChessPiece targetPiece = Chess.GameBoard.gameBoard[endRow][endCol];
+        if (targetPiece != null && targetPiece.iswhite() == this.iswhite()) {
+            return false; // Cannot move to a square occupied by a piece of the same color
+        }
+
+        // Temporarily move the King to check if it puts itself in check
+        ChessPiece temp = Chess.GameBoard.gameBoard[endRow][endCol]; // Save the piece at the destination
+        Chess.GameBoard.gameBoard[endRow][endCol] = this; // Move King to new position
+        Chess.GameBoard.gameBoard[startRow][startCol] = null; // Remove King from old position
+
+        boolean isInCheck = isInCheck(endRow, endCol); // Check if the King is in check
+
+        // Undo the temporary move
+        Chess.GameBoard.gameBoard[startRow][startCol] = this;
+        Chess.GameBoard.gameBoard[endRow][endCol] = temp;
+
+        return !isInCheck; // Only allow the move if it does NOT put the King in check
+    }
+
+    public void move() {
+        isFirstMove = false; // Once moved, first move rule no longer applies
+    }
+
+    public boolean hasMoved() {
+        return !isFirstMove;
+    }
+
+    public static boolean isInCheck(int kingRow, int kingCol) {
+        // Check all opponent pieces to see if they can attack the King
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = Chess.GameBoard.gameBoard[row][col];
+
+                if (piece != null && piece.iswhite() != Chess.GameBoard.gameBoard[kingRow][kingCol].iswhite()) {
+                    if (piece.isValidMove(row, col, kingRow, kingCol)) { // If it can move to the king's position
+                        return true; // King is in check
+                    }
+                }
+            }
+        }
+        return false; // King is safe
     }
 }
+
+
 
 // Queen
 class Queen implements ChessPiece {
@@ -131,7 +188,7 @@ class Bishop implements ChessPiece {
 // Pawn
 class Pawn implements ChessPiece {
     private final boolean isWhite;
-    private boolean isFirstMove = true; // Track if the pawn has moved before
+   private boolean isFirstMove = true; // Track if the pawn has moved before
 
     public Pawn(boolean isWhite) {
         this.isWhite = isWhite;
@@ -148,7 +205,7 @@ class Pawn implements ChessPiece {
     }
 
     @Override
-    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+    public boolean isValidMove(int startCol, int startRow, int endCol, int endRow) {
         int direction = isWhite ? 1 : -1; // White moves up (-1), Black moves down (+1)
         int rowDiff = endRow - startRow;
         int colDiff = Math.abs(endCol - startCol);
@@ -192,5 +249,4 @@ class Pawn implements ChessPiece {
     public void move() {
         isFirstMove = false; // Once moved, first move rule no longer applies
     }
-
 }
