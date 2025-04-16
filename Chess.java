@@ -50,7 +50,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
     public static class GameBoard extends Chess.BackgroundBoard implements MouseListener, KeyListener {
         static final ChessPiece[][] gameBoard = new ChessPiece[8][8];
-        boolean turn = true;
+
         ChessPiece Selected;
         int pieceX;
         int pieceY;
@@ -107,72 +107,126 @@ public class Chess { // Ronen Sherman - chess and chess bot
         }
 
         private void handleMove(int x, int y) {
-
             // Check if there's a piece at the clicked position
             if (gameBoard[y][x] != null) {
                 // If the same piece is clicked again, deselect it
                 if (Selected == gameBoard[y][x]) {
                     Selected = null;
                 }
-
                 // If no piece is currently selected, select the clicked piece
-                if (Selected == null) {
-                    if (turn && gameBoard[y][x].iswhite()) {
-                        // White turn
+                else if (Selected == null) {
+                    Selected = gameBoard[y][x];
+                    pieceX = x;
+                    pieceY = y;
+                }
+                // If a piece is already selected, check if it's a valid capture
+                else if (Selected.isValidMove(pieceX, pieceY, x, y) && gameBoard[y][x].iswhite() != Selected.iswhite()) {
+                    // Capture the piece (replace the enemy piece with the selected piece)
+                    gameBoard[y][x] = Selected;
+                    gameBoard[pieceY][pieceX] = null;
+                    Selected = null;
+                    redrawBoard();
+                }
+            }
+            // If an empty space is clicked and a piece is selected, attempt to move
+            else if (Selected != null) {
+                // Check for valid move or castling
+                if (Selected.isValidMove(pieceX, pieceY, x, y)) {
+                    // Regular move
+                    gameBoard[y][x] = Selected;
+                    gameBoard[pieceY][pieceX] = null;
 
-                        Selected = gameBoard[y][x];
-                        pieceX = x;
-                        pieceY = y;
-                        turn = false;
-
-                    } else if (!turn && !gameBoard[y][x].iswhite()) {
-                        //black turn
-                        Selected = gameBoard[y][x];
-                        pieceX = x;
-                        pieceY = y;
-                        turn = true;
+                    if (Selected instanceof King) {
+                        ((King) Selected).move(); // Mark King as having moved
                     }
+
+                    Selected = null; // Deselect after move
+                    redrawBoard();
+                } else if (CanCastle(pieceX, pieceY, x, y)) {
+                    // If castling is possible, perform castling
+                    performCastling(pieceX, pieceY, x, y);
+                    redrawBoard();
+                } else {
                     Selected = null; // Reset selection if the move is invalid
-                }    // If a piece is already selected, check if it's a valid capture
-                    else if (Selected.isValidMove(pieceX, pieceY, x, y) && gameBoard[y][x].iswhite() != Selected.iswhite()) {
-                        // Capture the piece (replace the enemy piece with the selected piece)
-                        gameBoard[y][x] = Selected;
-                        gameBoard[pieceY][pieceX] = null;
-                        Selected = null;
-
-                        // Redraw the board after capturing
-                        panel.clear(); // Custom method to clear the board
-                        Chess.BackgroundBoard.BackGroundDraw(75);
-                        PrintGame();
-                    }
-                // If an empty space is clicked and a piece is selected, attempt to move
-                else if (Selected != null) {
-                        if (Selected.isValidMove(pieceX, pieceY, x, y)) {
-                            // Move the selected piece
-                            gameBoard[y][x] = Selected;
-                            gameBoard[pieceY][pieceX] = null;
-                            Selected = null;
-
-                            // Redraw the board after moving
-                            panel.clear(); // Custom method to clear the board
-                            Chess.BackgroundBoard.BackGroundDraw(75);
-                            PrintGame();
-                        } else {
-                            Selected = null; // Reset selection if the move is invalid
-                        }
                 }
             }
         }
 
-        private Boolean CanCastle(int x,int y)
-        {
-            if(Objects.equals(Selected.getName(), "King"))
-            {
-                return true;
+        // Helper method to redraw the board
+        private void redrawBoard() {
+            panel.clear();
+            Chess.BackgroundBoard.BackGroundDraw(75);
+            PrintGame();
+        }
+
+        private void performCastling(int kingX, int kingY, int rookX, int rookY) {
+            // Determine direction of castling: left or right (based on rook's x position relative to king)
+            int step = (rookX > kingX) ? 1 : -1; // Right if rookX > kingX, left if rookX < kingX
+
+            King king = (King) Selected;
+            Rook rook = (Rook) gameBoard[rookY][rookX];
+
+            // Move the King to its new position (2 squares towards the Rook)
+            gameBoard[kingY][kingX + 2 * step] = king; // Place the King next to the Rook
+            gameBoard[kingY][kingX] = null; // Remove King from its original position
+
+            // Move the Rook to its new position (right next to the King)
+            gameBoard[kingY][kingX + step] = rook; // Place the Rook next to the King
+            gameBoard[rookY][rookX] = null; // Remove Rook from its original position
+
+            // Mark the King and Rook as having moved
+            king.move();
+            rook.move();
+        }
+
+        private boolean CanCastle(int kingX, int kingY, int rookX, int rookY) {
+            if (!(Selected instanceof King)) {
+                return false; // Only the King can castle
             }
 
+            King king = (King) Selected;
+            if (king.hasMoved()) {
+                return false; // King has already moved
+            }
+
+            if (!(gameBoard[rookY][rookX] instanceof Rook)) {
+                return false; // The piece must be a Rook
+            }
+
+            Rook rook = (Rook) gameBoard[rookY][rookX];
+            if (rook.hasMoved()) {
+                return false; // Rook has already moved
+            }
+
+            // Ensure there are no pieces between the King and the Rook
+            int step = (rookX > kingX) ? 1 : -1; // Determine direction of castling
+            for (int x = kingX + step; x != rookX; x += step) {
+                if (gameBoard[kingY][x] != null) {
+                    return false; // There's a piece blocking castling
+                }
+            }
+
+            // Ensure King does not pass through check
+            if (King.isInCheck(kingX, kingY) || King.isInCheck(kingX + step, kingY) || King.isInCheck(kingX + 2 * step, kingY)) {
                 return false;
+            }
+
+            // Perform castling
+            gameBoard[kingY][kingX + 2 * step] = king; // Move King two squares
+            gameBoard[kingY][rookX] = null; // Remove Rook from its original place
+            gameBoard[kingY][kingX + step] = rook; // Move Rook next to King
+            gameBoard[kingY][kingX] = null; // Remove King from its original position
+
+            king.move(); // Set the King as having moved
+            rook.move(); // Mark Rook as moved
+
+            return true; // Castling successful
         }
+
+
+
+
+
 
         @Override
         public void mouseReleased(MouseEvent e) {
