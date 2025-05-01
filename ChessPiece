@@ -53,8 +53,28 @@ class Rook implements ChessPiece {
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return startRow == endRow || startCol == endCol;
+        if (startRow != endRow && startCol != endCol) {
+            return false; // Must move straight
+        }
+
+        int rowStep = Integer.compare(endRow, startRow); // 1, 0, or -1
+        int colStep = Integer.compare(endCol, startCol); // 1, 0, or -1
+
+        int currentRow = startRow + rowStep;
+        int currentCol = startCol + colStep;
+
+        while (currentRow != endRow || currentCol != endCol) {
+            if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                return false; // Blocked
+            }
+            currentRow += rowStep;
+            currentCol += colStep;
+        }
+
+        // Last square (endRow, endCol) may have enemy piece (capture) or be empty
+        return true;
     }
+
     public void move() {
         isFirstMove = false; // Once moved, first move rule no longer applies
     }
@@ -88,26 +108,9 @@ class King implements ChessPiece {
         if (Math.abs(startRow - endRow) > 1 || Math.abs(startCol - endCol) > 1) {
             return false;
         }
-
-        // Check if the destination square is occupied by a friendly piece (same color)
-        ChessPiece targetPiece = Chess.GameBoard.gameBoard[endRow][endCol];
-        if (targetPiece != null && targetPiece.iswhite() == this.iswhite()) {
-            return false; // Cannot move to a square occupied by a piece of the same color
-        }
-
-        // Temporarily move the King to check if it puts itself in check
-        ChessPiece temp = Chess.GameBoard.gameBoard[endRow][endCol]; // Save the piece at the destination
-        Chess.GameBoard.gameBoard[endRow][endCol] = this; // Move King to new position
-        Chess.GameBoard.gameBoard[startRow][startCol] = null; // Remove King from old position
-
-        boolean isInCheck = isInCheck(endRow, endCol); // Check if the King is in check
-
-        // Undo the temporary move
-        Chess.GameBoard.gameBoard[startRow][startCol] = this;
-        Chess.GameBoard.gameBoard[endRow][endCol] = temp;
-
-        return !isInCheck; // Only allow the move if it does NOT put the King in check
+        return true;
     }
+    
 
     public void move() {
         isFirstMove = false; // Once moved, first move rule no longer applies
@@ -123,7 +126,7 @@ class King implements ChessPiece {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = Chess.GameBoard.gameBoard[row][col];
 
-                if (piece != null && piece.iswhite() != Chess.GameBoard.gameBoard[kingRow][kingCol].iswhite()) {
+                if ((piece != null && Chess.GameBoard.gameBoard[kingRow][kingCol]!= null) && (piece.iswhite() != Chess.GameBoard.gameBoard[kingRow][kingCol].iswhite()) ){
                     if (piece.isValidMove(row, col, kingRow, kingCol)) { // If it can move to the king's position
                         return true; // King is in check
                     }
@@ -133,8 +136,6 @@ class King implements ChessPiece {
         return false; // King is safe
     }
 }
-
-
 
 // Queen
 class Queen implements ChessPiece {
@@ -156,36 +157,103 @@ class Queen implements ChessPiece {
 
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return startRow == endRow || startCol == endCol ||
-                Math.abs(startRow - endRow) == Math.abs(startCol - endCol);
+        // Queen moves like rook OR bishop
+
+        // Rook-like movement (horizontal or vertical)
+        if (startRow == endRow || startCol == endCol) {
+            int rowStep = Integer.compare(endRow, startRow); // 1, 0, or -1
+            int colStep = Integer.compare(endCol, startCol); // 1, 0, or -1
+
+            int currentRow = startRow + rowStep;
+            int currentCol = startCol + colStep;
+
+            // Move along the path
+            while (currentRow != endRow || currentCol != endCol) {
+                if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                    return false; // Blocked
+                }
+                currentRow += rowStep;
+                currentCol += colStep;
+            }
+
+            return true;
+        }
+
+        // Bishop-like movement (diagonal)
+        else if (Math.abs(startRow - endRow) == Math.abs(startCol - endCol)) {
+            int rowStep = (endRow > startRow) ? 1 : -1; // Moves downwards for increasing row
+            int colStep = (endCol > startCol) ? 1 : -1; // Moves rightwards for increasing column
+
+            int currentRow = startRow + rowStep;
+            int currentCol = startCol + colStep;
+
+            // Move along the diagonal path
+            while (currentRow != endRow && currentCol != endCol) {
+                if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                    return false; // Blocked
+                }
+                currentRow += rowStep;
+                currentCol += colStep;
+            }
+
+            return true;
+        }
+
+        return false; // Invalid move
     }
 }
 
-// Bishop
+
+    // Bishop
 class Bishop implements ChessPiece {
-    private final boolean isWhite;
+        private final boolean isWhite;
 
-    public Bishop(boolean isWhite) {
-        this.isWhite = isWhite;
+        public Bishop(boolean isWhite) {
+            this.isWhite = isWhite;
+        }
+
+        @Override
+        public String getName() {
+            return "Bishop";
+        }
+
+        @Override
+        public boolean iswhite() {
+            return isWhite;
+        }
+
+        @Override
+        public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+            if (Math.abs(startRow - endRow) == Math.abs(startCol - endCol)) {
+                int rowStep = (endRow > startRow) ? 1 : -1;
+                int colStep = (endCol > startCol) ? 1 : -1;
+
+                int currentRow = startRow + rowStep;
+                int currentCol = startCol + colStep;
+
+                // Check for obstructions
+                while (currentRow != endRow && currentCol != endCol) {
+                    if (currentRow < 0 || currentRow >= 8 || currentCol < 0 || currentCol >= 8) {
+                        return false; // Avoid out-of-bounds
+                    }
+
+                    if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                        return false; // Blocked by another piece
+                    }
+
+                    currentRow += rowStep;
+                    currentCol += colStep;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
     }
 
-    @Override
-    public String getName() {
-        return "Bishop";
-    }
-
-    @Override
-    public boolean iswhite() {
-        return isWhite;
-    }
-
-    @Override
-    public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
-        return Math.abs(startCol - endCol) == Math.abs(startRow - endRow);
-    }
-}
-
-// Pawn
+        // Pawn
 class Pawn implements ChessPiece {
     private final boolean isWhite;
    private boolean isFirstMove = true; // Track if the pawn has moved before
@@ -206,18 +274,20 @@ class Pawn implements ChessPiece {
 
     @Override
     public boolean isValidMove(int startCol, int startRow, int endCol, int endRow) {
-        int direction = isWhite ? 1 : -1; // White moves up (-1), Black moves down (+1)
+        int direction = isWhite ? -1 : 1; // White moves up (-1), Black moves down (+1)
         int rowDiff = endRow - startRow;
         int colDiff = Math.abs(endCol - startCol);
 
         // Standard move: one step forward (must be an empty square)
         if (colDiff == 0 && rowDiff == direction && Chess.GameBoard.gameBoard[endRow][endCol] == null) {
+            move();
             return true;
         }
 
         // First move: two steps forward (must be an empty path and not blocked)
         if (isFirstMove && colDiff == 0 && rowDiff == 2 * direction) {
             if (Chess.GameBoard.gameBoard[startRow + direction][startCol] == null && Chess.GameBoard.gameBoard[endRow][endCol] == null) {
+                move();
                 return true;
             }
         }
