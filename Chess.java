@@ -7,7 +7,7 @@ import java.util.Arrays;
 import javax.swing.*;
 
 
- // Shift + Alt + (+/-) to zoom in/ out
+// Shift + Alt + (+/-) to zoom in/ out
 
 public class Chess { // Ronen Sherman - chess and chess bot
     public static DrawingPanel panel = new DrawingPanel(600, 650);
@@ -28,6 +28,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
         public static int[][] BackgroundBoard = new int[8][8];
 
         public BackgroundBoard() {
+
             for (int row = 0; row < 8; row++) {
                 for (int col = 0; col < 8; col++) {
                     BackgroundBoard[row][col] = (row + col) % 2;  // Alternates between 0 and 1
@@ -68,6 +69,10 @@ public class Chess { // Ronen Sherman - chess and chess bot
             // Place major pieces
             placeMajorPieces(7, true);  // Black pieces on row 0
             placeMajorPieces(0, false); // white pieces on row 7
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.setColor(Color.BLACK); // Or white depending on background
+            String turnText = isWhiteTurn ? "White's Turn" : "Black's Turn";
+            g.drawString(turnText, 20, 30); // X, Y position at top-left
         }
 
         private static void placeMajorPieces(int row, boolean isWhite) {
@@ -112,54 +117,76 @@ public class Chess { // Ronen Sherman - chess and chess bot
         private boolean isWhiteTurn = true; // true = white's turn, false = black's turn
 
         private void handleMove(int x, int y) throws InterruptedException {
-            // Check if there's a piece at the clicked position
             if (gameBoard[y][x] != null) {
-                // If the same piece is clicked again, deselect it
                 if (Selected == gameBoard[y][x]) {
                     Selected = null;
-                }
-                // If no piece is currently selected, select the clicked piece
-                else if (Selected == null && gameBoard[y][x].iswhite() == isWhiteTurn) {
+                } else if (Selected == null && gameBoard[y][x].iswhite() == isWhiteTurn) {
                     Selected = gameBoard[y][x];
                     pieceX = x;
                     pieceY = y;
-                }
-                // If a piece is already selected, check if it's a valid capture
-                else if (Selected != null && Selected.isValidMove(pieceX, pieceY, x, y)
+                } else if (Selected != null && Selected.isValidMove(pieceX, pieceY, x, y)
                         && gameBoard[y][x].iswhite() != Selected.iswhite()) {
                     gameBoard[y][x] = Selected;
                     gameBoard[pieceY][pieceX] = null;
+
+                    // Pawn promotion after capture
+                    if (Selected instanceof Pawn && (y == 0 || y == 7)) {
+                        gameBoard[y][x] = promotePawn(Selected.iswhite());
+                    }
+
+
                     redrawBoard();
                     Thread.sleep(100);
                     HandleCheck(Selected.iswhite());
                     Selected = null;
-                    isWhiteTurn = !isWhiteTurn; // Toggle turn
+                    isWhiteTurn = !isWhiteTurn;
+                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+
                 }
-            }
-            // If an empty space is clicked and a piece is selected, attempt to move
-            else if (Selected != null) {
+            } else if (Selected != null) {
                 if (Selected.isValidMove(pieceX, pieceY, x, y)) {
                     gameBoard[y][x] = Selected;
                     gameBoard[pieceY][pieceX] = null;
+
+                    // Pawn promotion after move
+                    if (Selected instanceof Pawn && (y == 0 || y == 7)) {
+                        gameBoard[y][x] = promotePawn(Selected.iswhite());
+                    }
+
+
                     redrawBoard();
                     Thread.sleep(100);
                     HandleCheck(Selected.iswhite());
                     Selected = null;
-                    isWhiteTurn = !isWhiteTurn; // Toggle turn
+                    isWhiteTurn = !isWhiteTurn;
+                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+
                 } else if (CanCastle(pieceX, pieceY, x, y)) {
                     performCastling(pieceX, pieceY, x, y);
                     redrawBoard();
                     Thread.sleep(100);
                     HandleCheck(Selected.iswhite());
                     Selected = null;
-                    isWhiteTurn = !isWhiteTurn; // Toggle turn
+                    isWhiteTurn = !isWhiteTurn;
+                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+
                 } else {
-                    Selected = null; // Reset selection if the move is invalid
+                    Selected = null;
                 }
             }
         }
 
+        public void repaintTurnLabel(Graphics g) {
+            // Clear previous label area (optional, if needed)
+            g.setColor(Color.LIGHT_GRAY); // Background color of label area
+            g.fillRect(0, 0, 200, 40); // Adjust width/height as needed
 
+            // Draw the turn label
+            g.setFont(new Font("Arial", Font.BOLD, 20));
+            g.setColor(Color.BLACK);
+            String text = isWhiteTurn ? "White's Turn" : "Black's Turn";
+            g.drawString(text, 20, 30); // Adjust position to where you want it
+        }
 
         // Helper method to redraw the board
         private void redrawBoard() {
@@ -222,11 +249,8 @@ public class Chess { // Ronen Sherman - chess and chess bot
             if (King.isInCheck(kingY, kingX + step)) { // King would pass through check
                 return false;
             }
-            if (King.isInCheck(kingY, kingX + 2 * step)) { // King would land in check
-                return false;
-            }
-
-            return true; // All checks passed, can castle
+            // King would land in check
+            return !King.isInCheck(kingY, kingX + 2 * step);// All checks passed, can castle
         }
 
         private void HandleCheck(boolean selectedColor) {
@@ -241,10 +265,10 @@ public class Chess { // Ronen Sherman - chess and chess bot
                         if (King.isInCheck(row, col)) {
                             if (kingIsWhite) {
                                 whiteKingInCheck = true;
-                                JOptionPane.showMessageDialog(null,"White is in check!");
+                                JOptionPane.showMessageDialog(null, "White is in check!");
                             } else {
                                 blackKingInCheck = true;
-                                JOptionPane.showMessageDialog(null,"Black is in check!");
+                                JOptionPane.showMessageDialog(null, "Black is in check!");
 
                             }
                         }
@@ -303,8 +327,27 @@ public class Chess { // Ronen Sherman - chess and chess bot
             return false; // No legal moves found
         }
 
+        private ChessPiece promotePawn(boolean isWhite) {
+            String[] options = {"Queen", "Rook", "Bishop", "Knight"};
+            String choice = (String) JOptionPane.showInputDialog(
+                    null,
+                    "Choose promotion piece:",
+                    "Pawn Promotion",
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    options,
+                    "Queen"
+            );
 
+            if (choice == null) return new Queen(isWhite); // Default if canceled
 
+            return switch (choice) {
+                case "Rook" -> new Rook(isWhite);
+                case "Bishop" -> new Bishop(isWhite);
+                case "Knight" -> new Knight(isWhite);
+                default -> new Queen(isWhite);
+            };
+        }
 
 
         @Override
