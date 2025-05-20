@@ -116,7 +116,11 @@ public class Chess { // Ronen Sherman - chess and chess bot
 
         private boolean isWhiteTurn = true; // true = white's turn, false = black's turn
 
+        public static int[] enPassantTargetSquare = null;
+
+
         private void handleMove(int x, int y) throws InterruptedException {
+            // If clicking on a piece
             if (gameBoard[y][x] != null) {
                 if (Selected == gameBoard[y][x]) {
                     Selected = null;
@@ -126,6 +130,14 @@ public class Chess { // Ronen Sherman - chess and chess bot
                     pieceY = y;
                 } else if (Selected != null && Selected.isValidMove(pieceX, pieceY, x, y)
                         && gameBoard[y][x].iswhite() != Selected.iswhite()) {
+
+                    // Try en passant first
+                    if (handleEnPassant(pieceX, pieceY, x, y)) {
+                        // en passant move done, exit early
+                        return;
+                    }
+
+                    // Normal capture move
                     gameBoard[y][x] = Selected;
                     gameBoard[pieceY][pieceX] = null;
 
@@ -134,32 +146,48 @@ public class Chess { // Ronen Sherman - chess and chess bot
                         gameBoard[y][x] = promotePawn(Selected.iswhite());
                     }
 
-
                     redrawBoard();
                     Thread.sleep(100);
                     HandleCheck(Selected.iswhite());
                     Selected = null;
                     isWhiteTurn = !isWhiteTurn;
-                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+                    repaintTurnLabel(g);
+
+                    // Clear enPassant target if not set this move
+                    enPassantTargetSquare = null;
 
                 }
             } else if (Selected != null) {
+                // If trying to move to empty square
+
+                // Try en passant first
+                if (handleEnPassant(pieceX, pieceY, x, y)) {
+                    return;
+                }
+
                 if (Selected.isValidMove(pieceX, pieceY, x, y)) {
                     gameBoard[y][x] = Selected;
                     gameBoard[pieceY][pieceX] = null;
+
+                    // If pawn moved 2 squares forward, set en passant target
+                    if (Selected instanceof Pawn && Math.abs(y - pieceY) == 2) {
+                        int enPassantRow = (y + pieceY) / 2;
+                        enPassantTargetSquare = new int[] {enPassantRow, x};
+                    } else {
+                        enPassantTargetSquare = null;
+                    }
 
                     // Pawn promotion after move
                     if (Selected instanceof Pawn && (y == 0 || y == 7)) {
                         gameBoard[y][x] = promotePawn(Selected.iswhite());
                     }
 
-
                     redrawBoard();
                     Thread.sleep(100);
                     HandleCheck(Selected.iswhite());
                     Selected = null;
                     isWhiteTurn = !isWhiteTurn;
-                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+                    repaintTurnLabel(g);
 
                 } else if (CanCastle(pieceX, pieceY, x, y)) {
                     performCastling(pieceX, pieceY, x, y);
@@ -168,13 +196,75 @@ public class Chess { // Ronen Sherman - chess and chess bot
                     HandleCheck(Selected.iswhite());
                     Selected = null;
                     isWhiteTurn = !isWhiteTurn;
-                    repaintTurnLabel(g); // This triggers paintComponent to redraw the turn text
+                    repaintTurnLabel(g);
 
                 } else {
                     Selected = null;
                 }
             }
         }
+
+
+        private boolean handleEnPassant(int fromX, int fromY, int toX, int toY) throws InterruptedException {
+            if (Selected instanceof Pawn && enPassantTargetSquare != null) {
+                if (toX == enPassantTargetSquare[1] && toY == enPassantTargetSquare[0]) {
+                    Pawn pawn = (Pawn) Selected;
+                    if (pawn.canEnPassant(fromX, fromY, toX, toY)) {
+                        // Capture the pawn en passant
+                        gameBoard[toY][toX] = Selected;
+                        gameBoard[fromY][fromX] = null;
+
+                        // Remove the pawn being captured en passant
+                        int direction = pawn.iswhite() ? 1 : -1;
+                        gameBoard[toY + direction][toX] = null;
+
+                        redrawBoard();
+                        Thread.sleep(100);
+                        HandleCheck(pawn.iswhite());
+                        Selected = null;
+                        isWhiteTurn = !isWhiteTurn;
+                        repaintTurnLabel(g);
+                        enPassantTargetSquare = null;
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private boolean moveLeavesKingInCheck(int fromX, int fromY, int toX, int toY, boolean isWhiteMoving) {
+            ChessPiece fromPiece = Chess.GameBoard.gameBoard[fromY][fromX];
+            ChessPiece toPiece = Chess.GameBoard.gameBoard[toY][toX];
+
+            // Make the move temporarily
+            Chess.GameBoard.gameBoard[toY][toX] = fromPiece;
+            Chess.GameBoard.gameBoard[fromY][fromX] = null;
+
+            // Find the king position for this player
+            int kingRow = -1, kingCol = -1;
+            for (int row = 0; row < 8; row++) {
+                for (int col = 0; col < 8; col++) {
+                    ChessPiece p = Chess.GameBoard.gameBoard[row][col];
+                    if (p instanceof King && p.iswhite() == isWhiteMoving) {
+                        kingRow = row;
+                        kingCol = col;
+                        break;
+                    }
+                }
+                if (kingRow != -1) break;
+            }
+
+            // If king not found (should never happen), treat as in check
+            boolean inCheck = (kingRow == -1) || King.isInCheck(kingRow, kingCol);
+
+            // Undo the move
+            Chess.GameBoard.gameBoard[fromY][fromX] = fromPiece;
+            Chess.GameBoard.gameBoard[toY][toX] = toPiece;
+
+            return inCheck;
+        }
+
+
 
         public void repaintTurnLabel(Graphics g) {
             // Clear previous label area (optional, if needed)
@@ -348,6 +438,12 @@ public class Chess { // Ronen Sherman - chess and chess bot
                 default -> new Queen(isWhite);
             };
         }
+
+        private void HandleEnPassent()
+        {
+
+        }
+
 
 
         @Override
