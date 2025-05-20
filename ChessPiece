@@ -105,12 +105,9 @@ class King implements ChessPiece {
     @Override
     public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
         // Ensure the King moves within one square in any direction (horizontally, vertically, or diagonally)
-        if (Math.abs(startRow - endRow) > 1 || Math.abs(startCol - endCol) > 1) {
-            return false;
-        }
-        return true;
+        return Math.abs(startRow - endRow) <= 1 && Math.abs(startCol - endCol) <= 1;
     }
-    
+
 
     public void move() {
         isFirstMove = false; // Once moved, first move rule no longer applies
@@ -189,7 +186,7 @@ class Queen implements ChessPiece {
 
             // Move along the diagonal path
             while (currentRow != endRow && currentCol != endCol) {
-                if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                if (Chess.GameBoard.gameBoard[currentCol][currentRow] != null) {
                     return false; // Blocked
                 }
                 currentRow += rowStep;
@@ -223,7 +220,7 @@ class Bishop implements ChessPiece {
         }
 
         @Override
-        public boolean isValidMove(int startRow, int startCol, int endRow, int endCol) {
+        public boolean isValidMove(int startCol, int startRow, int endCol, int endRow) {
             if (Math.abs(startRow - endRow) == Math.abs(startCol - endCol)) {
                 int rowStep = (endRow > startRow) ? 1 : -1;
                 int colStep = (endCol > startCol) ? 1 : -1;
@@ -237,7 +234,7 @@ class Bishop implements ChessPiece {
                         return false; // Avoid out-of-bounds
                     }
 
-                    if (Chess.GameBoard.gameBoard[currentRow][currentCol] != null) {
+                    if (Chess.GameBoard.gameBoard[currentCol][currentRow] != null) {
                         return false; // Blocked by another piece
                     }
 
@@ -301,21 +298,14 @@ class Pawn implements ChessPiece {
     }
 
     // En Passant validation (checked at the game level)
-    public boolean canEnPassant(int startRow, int startCol, int endRow, int endCol,
-                                Pawn lastMovedPawn, int lastMoveStartRow, int lastMoveEndRow, int lastMoveCol) {
-        if (lastMovedPawn == null || lastMovedPawn.iswhite() == this.isWhite) {
-            return false; // En passant only applies to an adjacent pawn of the opposite color
-        }
-
-        // En passant is only valid if the opponent just moved two squares forward
-        if (Math.abs(lastMoveStartRow - lastMoveEndRow) == 2 && lastMoveEndRow == startRow) {
-            return lastMoveCol == endCol; // The target column must match the opponent’s last column
-        }
-
-        return false;
+    public boolean canEnPassant(int fromX, int fromY, int toX, int toY) {
+        int direction = this.iswhite() ? -1 : 1;  // white moves up (-1), black down (+1)
+        return (toY == fromY + direction) && (Math.abs(toX - fromX) == 1);
     }
 
-    // Call this method after a pawn moves
+
+
+            // Call this method after a pawn moves
     public void move() {
         isFirstMove = false; // Once moved, first move rule no longer applies
     }
