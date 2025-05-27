@@ -456,7 +456,7 @@ public class Chess { // Ronen Sherman - chess and chess bot
             int x = e.getX() / 75;
             int y = e.getY() / 75;
 
-            // Ensure the coordinates are within the board boundaries
+            // Ensure the coordinates are within the board boundaries // 
             if (x < 0 || x >= 8 || y < 0 || y >= 8) {
                 return;  // Ignore clicks outside the board
             }
