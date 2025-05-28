@@ -1,0 +1,52 @@
+import java.awt.*;
+
+public class Snake {
+
+    public static void main(String[] args) {
+        GameBoard.panel.setVisible(true);
+        Fruit f = new Fruit();
+
+    }
+
+    public static class GameBoard {
+        private static final int size = 250;
+        public static boolean DoGame = true;
+        public static char[][] Grid = new char[size][size];
+        public static DrawingPanel panel = new DrawingPanel(size * 5, size * 5);
+        public static Graphics g = panel.getGraphics();
+        public static final Color snakeColor = null;
+        public static final Color snakeheadColor = null;
+
+
+        public static void PrintGame() {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
+                    switch (Grid[i][j]) {
+                        case 'S' -> g.setColor(snakeColor);
+                        case 'F' -> g.setColor(Fruit.FruitColor);
+                        case 'H' -> g.setColor(snakeheadColor);
+                    }
+
+                }
+            }
+        }
+    }
+
+    public static class Fruit
+    {
+        public Fruit()
+        {
+            SetFruit();
+        }
+        public static final Color FruitColor = null;
+        public int FruitPosX;
+        public int FruitPosY;
+
+        public void SetFruit()// draws the fruit
+        {
+            FruitPosX = (int) (Math.random() * 250);
+            FruitPosY = (int) (Math.random() * 250);
+        }
+    }
+}
+
