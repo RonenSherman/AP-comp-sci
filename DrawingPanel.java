@@ -29,31 +29,10 @@
  * See JavaDoc comments below for more information.
  */
 
-import java.awt.FontMetrics;
-import java.awt.Rectangle;
-import java.awt.Shape;
+import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.text.AttributedCharacterIterator;
 import java.util.Collections;
-import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Container;
-import java.awt.Dimension;
-import java.awt.EventQueue;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Frame;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridLayout;
-import java.awt.Image;
-import java.awt.MediaTracker;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.Toolkit;
-import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -288,7 +267,7 @@ import javax.swing.filechooser.FileFilter;
  * @author Stuart Reges (University of Washington) and Marty Stepp
  * @version 4.07, 2022/04/07 (BJP 5th edition)
  */
-public final class DrawingPanel implements ImageObserver {
+public final class DrawingPanel extends Component implements ImageObserver {
     // class constants
     private static final Color GRID_LINE_COLOR      = new Color(64, 64, 64, 128);   // color of grid lines on panel
     private static final Object LOCK                = new Object();                 // object used for concurrency locking
