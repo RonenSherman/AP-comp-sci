@@ -388,6 +388,6 @@ class SnakeBot extends Snake {
         return false;
     }
 }
-
+//
 
 
