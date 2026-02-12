@@ -1,31 +1,33 @@
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.*;
-import javax.swing.*;
+
+
+// game idea for next year: snake is controlled by ai and you control the fruit and have to run away from it.
 
 public class SnakeGame {
-    public static int HIGH_SCORE = 0;
     public static final Color SNAKE_COLOR = Color.GREEN; // Default fixed color
     private static final int PANEL_WIDTH = 800;
     private static final int PANEL_HEIGHT = 600;
-    private static final int CELL_SIZE = 20;
-    public static final int INITIAL_SPEED = 100;  // Faster initial speed
-    public static final int MIN_SPEED = 40;       // Faster minimum speed
-    public static final int SPEED_DECREASE = 2;   // Smaller speed decrease for smoother acceleration
+    public static final int INITIAL_SPEED = 50;  // Faster initial speed
+    public static final int MIN_SPEED = 1;       // Faster minimum speed
+    public static final int SPEED_DECREASE = 1;   // Smaller speed decrease for smoother acceleration
 
-    public static void main(String[] args) {
-        Snake snake = new Snake();
-        startGame(snake);
+    public static void main(String[] args) throws IOException {
+
+        Snake snake = new SnakeBot();
+            startGame(snake);
     }
 
-    public static void startGame(Snake snake) {
-        snake = new Snake();
-        System.out.println("Welcome to snake game!");
-        System.out.println("The goal is to get points by eating fruit and to not run into any walls");
-
+    public static void startGame(Snake snake) throws IOException {
+        Path filePath = (Path.of("C:\\Users\\shermanr\\IdeaProjects\\Random java work\\SnakeScore"));
+        int score = Integer.parseInt(Files.readString(filePath));
+        snake.setSnakeHighScore(score);
         snake.setSnakeLook('■');
 
-        snake.setSnakeHighScore(HIGH_SCORE);
         snake.setDirection("Right");
         Fruit fruit = new Fruit();
         snake.setSnakeLength(3);
@@ -33,7 +35,7 @@ public class SnakeGame {
         snake.setSnakeSpeed(INITIAL_SPEED);
 
         DrawingPanel panel = new DrawingPanel(PANEL_WIDTH, PANEL_HEIGHT);
-        Graphics2D g = (Graphics2D)panel.getGraphics();
+        Graphics2D g = (Graphics2D) panel.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
         panel.setBackground(Color.BLACK);
 
@@ -41,17 +43,27 @@ public class SnakeGame {
         gameLoop(snake, fruit, panel, g);
     }
 
-    static void gameLoop(Snake snake, Fruit fruit, DrawingPanel panel, Graphics g) {
-        KeyboardListener keyListener = new KeyboardListener(snake);
-        panel.addKeyListener(keyListener);
+    static void gameLoop(Snake snake, Fruit fruit, DrawingPanel panel, Graphics g) throws IOException {
+        if (!(snake instanceof SnakeBot)) {
+            KeyboardListener keyListener = new KeyboardListener(snake);
+            panel.addKeyListener(keyListener);
+        }
 
         while (snake.isAlive()) {
             snake.moveSnake(fruit, snake, panel, g);
             panel.sleep(snake.getSnakeSpeed());
         }
         System.out.println(snake.getScore());
-    System.exit(0);
+        Path filePath = (Path.of("C:\\Users\\shermanr\\IdeaProjects\\Random java work\\SnakeScore"));
+        int score = Integer.parseInt(Files.readString(filePath));
+        if(snake.getScore() > score)
+        {
+            snake.setSnakeHighScore(snake.getScore());
+            Files.writeString(filePath, (String.valueOf(snake.getSnakeHighScore())));
+        }
+        System.exit(0);
     }
+
 
 
 }
@@ -64,14 +76,12 @@ class Snake {
     private int newPosY;
     private char snakeLook;
     private boolean isAlive;
-    private int snakeHighScore;
+    public int snakeHighScore;
     private int snakeLength;
     private int snakeSpeed;
     private int score;
-    private int lastPosX;
-    private int lastPosY;
-    private ArrayList<Integer> snakePosX;
-    private ArrayList<Integer> snakePosY;
+    public final ArrayList<Integer> snakePosX;
+    public final ArrayList<Integer> snakePosY;
     private static final int CELL_SIZE = 20;
     private final Rectangle snakeRect = new Rectangle(CELL_SIZE - 2, CELL_SIZE - 2); // Reusable rectangle for drawing
 
@@ -80,69 +90,121 @@ class Snake {
         snakePosY = new ArrayList<>();
         score = 0;
     }
+    // Add inside the Snake class
+    public ArrayList<Integer> getSnakePosX() {
+        return snakePosX;
+    }
+
+   public  ArrayList<Integer> getSnakePosY() {
+        return snakePosY;
+    }
+        public int getSnakeHighScore()
+        {
+                return snakeHighScore;
+        }
 
     // Getters and setters
-    public void setDirection(String direction) { this.direction = direction; }
-    public String getDirection() { return direction; }
-    public void setSnakeLook(char look) { this.snakeLook = look; }
-    public void setAlive(boolean alive) { this.isAlive = alive; }
-    public boolean isAlive() { return isAlive; }
-    public void setSnakeHighScore(int score) { this.snakeHighScore = score; }
-    public void setSnakeLength(int length) { this.snakeLength = length; }
-    public void setSnakeSpeed(int speed) { this.snakeSpeed = speed; }
-    public int getSnakeSpeed() { return snakeSpeed; }
-    public int getScore() { return score; }
-    public char getLastInput() { return lastInput; }
-    public void setLastInput(char input) { this.lastInput = input; }
+    public void setDirection(String direction) {
+        this.direction = direction;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setSnakeLook(char look) {
+        this.snakeLook = look;
+    }
+
+    public void setAlive(boolean alive) {
+        this.isAlive = alive;
+    }
+
+    public boolean isAlive() {
+        return isAlive;
+    }
+
+    public void setSnakeHighScore(int score) {
+        this.snakeHighScore = score;
+    }
+
+    public void setSnakeLength(int length) {
+        this.snakeLength = length;
+    }
+
+    public void setSnakeSpeed(int speed) {
+        this.snakeSpeed = speed;
+    }
+
+    public int getSnakeSpeed() {
+        return snakeSpeed;
+    }
+
+    public int getScore() {
+        return score;
+    }
+
+    public char getLastInput() {
+        return lastInput;
+    }
+
+    public void setLastInput(char input) {
+        this.lastInput = input;
+    }
 
     public void createSnake(Fruit fruit) {
         for (int i = 0; i < snakeLength; i++) {
             snakePosX.add(15 - i);
             snakePosY.add(15);
         }
-        newPosX = snakePosX.get(0);
-        newPosY = snakePosY.get(0);
+        newPosX = snakePosX.getFirst();
+        newPosY = snakePosY.getFirst();
     }
 
     public void moveSnake(Fruit fruit, Snake snake, DrawingPanel panel, Graphics g) {
         switch (direction) {
             case "Left":
-                newPosX = snakePosX.get(0) - 1;
-                newPosY = snakePosY.get(0);
+                newPosX = snakePosX.getFirst() - 1;
+                newPosY = snakePosY.getFirst();
                 break;
             case "Right":
-                newPosX = snakePosX.get(0) + 1;
-                newPosY = snakePosY.get(0);
+                newPosX = snakePosX.getFirst() + 1;
+                newPosY = snakePosY.getFirst();
                 break;
             case "Up":
-                newPosX = snakePosX.get(0);
-                newPosY = snakePosY.get(0) - 1;
+                newPosX = snakePosX.getFirst();
+                newPosY = snakePosY.getFirst() - 1;
                 break;
             case "Down":
-                newPosX = snakePosX.get(0);
-                newPosY = snakePosY.get(0) + 1;
+                newPosX = snakePosX.getFirst();
+                newPosY = snakePosY.getFirst() + 1;
                 break;
         }
         updateSnake(fruit, snake, panel, g);
     }
 
     public void updateSnake(Fruit fruit, Snake snake, DrawingPanel panel, Graphics g) {
+        // Add new head position first
+        snakePosX.addFirst(newPosX);
+        snakePosY.addFirst(newPosY);
+
+        // Check for collisions
         snakeCollisionCheck();
         snakeBoundaries();
 
         if (isAlive) {
             Graphics2D g2d = (Graphics2D) g;
 
-            // Clear the panel and redraw everything
+            // Clear screen
             g2d.setColor(Color.BLACK);
             g2d.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 
-            // Draw score
+            // Score info
             g2d.setColor(Color.WHITE);
             g2d.drawString("Score: " + score, 10, 20);
             g2d.drawString("High Score: " + snakeHighScore, 10, 40);
 
-            // Draw snake more efficiently using a single rectangle instance
+            // Draw snake
             g2d.setColor(SnakeGame.SNAKE_COLOR);
             for (int i = 0; i < snakePosX.size(); i++) {
                 snakeRect.setLocation(snakePosX.get(i) * CELL_SIZE, snakePosY.get(i) * CELL_SIZE);
@@ -154,31 +216,28 @@ class Snake {
             snakeRect.setLocation(fruit.getFruitPosX() * CELL_SIZE, fruit.getFruitPosY() * CELL_SIZE);
             g2d.fill(snakeRect);
 
-            // Update snake position
-            snakePosX.add(0, newPosX);
-            snakePosY.add(0, newPosY);
-            lastPosX = snakePosX.remove(snakePosX.size() - 1);
-            lastPosY = snakePosY.remove(snakePosY.size() - 1);
-
-            if (fruit.getFruitPosX() == snakePosX.get(0) && fruit.getFruitPosY() == snakePosY.get(0)) {
+            // Check for fruit
+            if (fruit.getFruitPosX() == snakePosX.getFirst() && fruit.getFruitPosY() == snakePosY.getFirst()) {
                 didEatFruit = true;
                 snakeLength++;
                 score++;
-                snakePosX.add(lastPosX);
-                snakePosY.add(lastPosY);
 
                 if (snakeSpeed > SnakeGame.MIN_SPEED) {
                     snakeSpeed -= SnakeGame.SPEED_DECREASE;
                 }
 
                 fruit.drawFruit();
+            } else {
+                // Didn’t eat: remove tail
+                snakePosX.removeLast();
+                snakePosY.removeLast();
             }
         }
     }
 
     public void snakeCollisionCheck() {
         for (int i = 1; i < snakePosX.size(); i++) {
-            if (snakePosX.get(0).equals(snakePosX.get(i)) && snakePosY.get(0).equals(snakePosY.get(i))) {
+            if (snakePosX.getFirst().equals(snakePosX.get(i)) && snakePosY.getFirst().equals(snakePosY.get(i))) {
                 isAlive = false;
             }
         }
@@ -188,14 +247,14 @@ class Snake {
         int maxX = 39;  // (800/20) - 1
         int maxY = 29;  // (600/20) - 1
 
-        if (snakePosX.get(0) >= maxX || snakePosY.get(0) >= maxY ||
-                snakePosX.get(0) < 0 || snakePosY.get(0) < 0) {
+        if (snakePosX.getFirst() >= maxX || snakePosY.getFirst() >= maxY ||
+                snakePosX.getFirst() < 0 || snakePosY.getFirst() < 0) {
             isAlive = false;
         }
     }
 }
 
-class Fruit {
+class Fruit extends Snake {
     private int fruitPosX;
     private int fruitPosY;
     private static final Random random = new Random();
@@ -206,12 +265,25 @@ class Fruit {
         drawFruit();
     }
 
-    public int getFruitPosX() { return fruitPosX; }
-    public int getFruitPosY() { return fruitPosY; }
+    public int getFruitPosX() {
+        return fruitPosX;
+    }
+
+    public int getFruitPosY() {
+        return fruitPosY;
+    }
+
 
     public void drawFruit() {
-        fruitPosX = random.nextInt(MAX_X);
-        fruitPosY = random.nextInt(MAX_Y);
+        Set<String> occupied = new HashSet<>();
+        for (int i = 0; i < getSnakePosX().size(); i++) {
+            occupied.add(getSnakePosX().get(i) + "," + getSnakePosY().get(i));
+        }
+
+        do {
+            fruitPosX = random.nextInt(MAX_X);
+            fruitPosY = random.nextInt(MAX_Y);
+        } while (occupied.contains(fruitPosX + "," + fruitPosY));
     }
 }
 
@@ -252,3 +324,70 @@ class KeyboardListener extends KeyAdapter {
         snake.setLastInput(input);
     }
 }
+
+
+class SnakeBot extends Snake {
+    @Override
+    public void moveSnake(Fruit fruit, Snake snake, DrawingPanel panel, Graphics g) {
+        int headX = getSnakePosX().getFirst();
+        int headY = getSnakePosY().getFirst();
+        int fruitX = fruit.getFruitPosX();
+        int fruitY = fruit.getFruitPosY();
+
+        // Preferred directions first
+        String[] directions = new String[] {
+                fruitX < headX ? "Left"  : fruitX > headX ? "Right" : "",
+                fruitY < headY ? "Up"    : fruitY > headY ? "Down"  : "",
+                "Left", "Right", "Up", "Down" // fallback
+        };
+
+        for (String direction : directions) {
+            if (direction.isEmpty()) continue;
+
+            int newX = headX, newY = headY;
+            switch (direction) {
+                case "Left":  newX--; break;
+                case "Right": newX++; break;
+                case "Up":    newY--; break;
+                case "Down":  newY++; break;
+            }
+
+            if (!willCollide(newX, newY)) {
+                setDirection(direction);
+                switch (direction) {
+                    case "Left":  setLastInput('a'); break;
+                    case "Right": setLastInput('d'); break;
+                    case "Up":    setLastInput('w'); break;
+                    case "Down":  setLastInput('s'); break;
+                }
+
+                // Only move if a valid direction is found
+                super.moveSnake(fruit, snake, panel, g);
+                return;
+            }
+        }
+
+       snake.setAlive(false);
+    }
+
+
+
+    private boolean willCollide(int x, int y) {
+        int maxX = 39;
+        int maxY = 29;
+
+        if (x < 0 || x >= maxX || y < 0 || y >= maxY) {
+            return true;
+        }
+
+        for (int i = 0; i < getSnakePosX().size(); i++) {
+            if (getSnakePosX().get(i) == x && getSnakePosY().get(i) == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+}
+
+
+
